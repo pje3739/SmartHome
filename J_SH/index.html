@@ -7,6 +7,9 @@
     <title>jieun's Smart Home Dashboard</title>
     <!-- 귀여운 도트 느낌의 폰트(NeoDunggeunmo) 로드 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/neodunggeunmo/neodunggeunmo@v1.5.0/neodunggeunmo.css">
+    <!-- TensorFlow.js & Teachable Machine Image 라이브러리 CDN 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <style>
         :root {
             --bg-color: #ffd1dc;
@@ -549,6 +552,8 @@
                         캐릭터 선택 / 변경하기</button>
                     <button class="kitsch-btn" style="background: var(--mint);" onclick="goToPage('page-smarthome')">🏠
                         스마트홈 제어판 입장</button>
+                    <button class="kitsch-btn" style="background: var(--purple); color: #fff;" onclick="goToPage('page-entrance')">🚪
+                        출입문 제어 시스템 입장</button>
                     <button class="kitsch-btn" style="background: #ff8b8b; color: #fff;" onclick="handleLogout()">🔒
                         로그아웃</button>
                 </div>
@@ -728,6 +733,44 @@
         <div class="bottom-menu" style="display: flex; gap: 15px; margin-top: 25px; width: 100%; justify-content: center;">
             <button class="kitsch-btn" style="background: var(--yellow); max-width: 180px; margin: 0;" onclick="goToPage('page-select')">⚡ 캐릭터 변경</button>
             <button class="kitsch-btn" style="background: #fff; max-width: 180px; margin: 0;" onclick="handleDisconnectAndExit()">🔌 연결해제 & 홈</button>
+        </div>
+    </div>
+
+    <!-- PAGE 4: 출입문 제어 시스템 화면 -->
+    <div id="page-entrance" class="page">
+        <div class="tamagotchi-frame" style="max-width: 480px;">
+            <div class="title-banner" style="background: var(--purple); color: #fff;">🔒 SMART DOOR</div>
+            
+            <div class="input-group" style="text-align: left;">
+                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #000; padding-left: 5px;">티처블 머신 모델 URL:</label>
+                <input type="text" id="tm-url" class="pixel-input" placeholder="https://teachablemachine.withgoogle.com/models/xxxx/" value="">
+                <p style="font-size: 10px; color: #444; margin: 0 5px 8px 5px; line-height: 1.4;">
+                    * 팁: 본인이 학습하여 업로드한 모델 주소를 입력한 뒤 아래 [카메라 켜기]를 누르세요.
+                </p>
+            </div>
+
+            <!-- 상태 및 메세지 표시 LCD -->
+            <div id="entrance-status" class="lcd-screen" style="background: #0f380f; color: #9bbc0f; padding: 12px; border-radius: 10px; text-align: center; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #000;">
+                <span id="gate-message" style="font-size: 15px; font-weight: bold;">카메라 대기 중...</span>
+                <span id="predict-result" style="font-size: 12px; margin-top: 6px; color: var(--screen-light);"></span>
+            </div>
+
+            <!-- 웹캠 영상 박스 -->
+            <div id="webcam-container" style="border: 4px solid #000; border-radius: 15px; overflow: hidden; position: relative; width: 100%; height: 220px; background: #222; margin: 15px 0; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 0px #000;">
+                <video id="webcam-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1);"></video>
+                <span id="webcam-placeholder" style="color: #666; font-size: 13px;">📹 카메라가 꺼져 있습니다.</span>
+            </div>
+
+            <button id="start-cam-btn" class="kitsch-btn" style="background: var(--yellow);" onclick="startEntranceCamera()">📹 카메라 켜기 & 인식 시작</button>
+            
+            <!-- 수동 제어 버튼들 -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                <button class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('o')">🔓 문 열기</button>
+                <button class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('c')">🔒 문 닫기</button>
+            </div>
+            <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;" onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
+
+            <button class="kitsch-btn" style="background: #fff; margin-top: 15px;" onclick="stopEntranceCamera(); goToPage('page-home')">⬅ 홈으로 돌아가기</button>
         </div>
     </div>
 
@@ -1142,6 +1185,150 @@
             const logEl = document.getElementById('terminal-log');
             if (logEl) {
                 logEl.innerHTML = '<div style="color: #888;">[Terminal cleared]</div>';
+            }
+        }
+
+        // ==========================================
+        // Teachable Machine 얼굴 인식 출입문 시스템 스크립트
+        // ==========================================
+        let tmModel = null;
+        let webcamStream = null;
+        let isPredicting = false;
+        let predictionInterval = null;
+
+        // 카메라 및 인식 루프 시작
+        async function startEntranceCamera() {
+            const modelUrlInput = document.getElementById('tm-url').value.trim();
+            if (!modelUrlInput) {
+                alert("티처블 머신 모델 URL을 입력해 주세요!\n(예: https://teachablemachine.withgoogle.com/models/xxxx/)");
+                return;
+            }
+            
+            let modelURL = modelUrlInput;
+            if (!modelURL.endsWith('/')) {
+                modelURL += '/';
+            }
+            
+            document.getElementById('gate-message').innerText = "모델 로드 중...";
+            logTerminal('System', 'Loading Teachable Machine model from: ' + modelURL);
+            
+            try {
+                const checkpointURL = modelURL + 'model.json';
+                const metadataURL = modelURL + 'metadata.json';
+                
+                tmModel = await tmImage.load(checkpointURL, metadataURL);
+                const maxPredictions = tmModel.getTotalClasses();
+                logTerminal('System', `Model loaded! Classes: ${maxPredictions}`);
+                
+                // 웹캠 활성화
+                document.getElementById('gate-message').innerText = "카메라 초기화 중...";
+                const video = document.getElementById('webcam-video');
+                const placeholder = document.getElementById('webcam-placeholder');
+                
+                webcamStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 320, height: 240, facingMode: 'user' },
+                    audio: false
+                });
+                
+                video.srcObject = webcamStream;
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                document.getElementById('gate-message').innerText = "인식 분석 대기...";
+                document.getElementById('start-cam-btn').innerText = "🛑 인식 종료하기";
+                document.getElementById('start-cam-btn').style.background = '#ff8b8b';
+                document.getElementById('start-cam-btn').onclick = stopEntranceCamera;
+                
+                isPredicting = true;
+                // 800ms 간격으로 예측 루프 실행
+                predictionInterval = setInterval(predictFace, 800);
+                
+            } catch (error) {
+                console.error(error);
+                document.getElementById('gate-message').innerText = "오류 발생! URL/카메라 확인";
+                logTerminal('Error', 'Teachable Machine Error: ' + error.message);
+            }
+        }
+
+        // 카메라 및 인식 중지
+        function stopEntranceCamera() {
+            if (predictionInterval) {
+                clearInterval(predictionInterval);
+                predictionInterval = null;
+            }
+            
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+            }
+            
+            const video = document.getElementById('webcam-video');
+            const placeholder = document.getElementById('webcam-placeholder');
+            
+            video.srcObject = null;
+            video.style.display = 'none';
+            placeholder.style.display = 'block';
+            
+            document.getElementById('gate-message').innerText = "카메라 대기 중...";
+            document.getElementById('gate-message').style.color = 'var(--screen-bg)';
+            document.getElementById('predict-result').innerText = "";
+            
+            const btn = document.getElementById('start-cam-btn');
+            btn.innerText = "📹 카메라 켜기 & 인식 시작";
+            btn.style.background = 'var(--yellow)';
+            btn.onclick = startEntranceCamera;
+            
+            isPredicting = false;
+            logTerminal('System', 'Face recognition stopped.');
+        }
+
+        // 실시간 프레임 예측 실행
+        async function predictFace() {
+            if (!isPredicting || !tmModel) return;
+            
+            const video = document.getElementById('webcam-video');
+            try {
+                const prediction = await tmModel.predict(video);
+                
+                let highestClass = '';
+                let highestProb = 0;
+                
+                for (let i = 0; i < prediction.length; i++) {
+                    if (prediction[i].probability > highestProb) {
+                        highestProb = prediction[i].probability;
+                        highestClass = prediction[i].className;
+                    }
+                }
+                
+                const probPct = Math.round(highestProb * 100);
+                document.getElementById('predict-result').innerText = `${highestClass} (${probPct}%)`;
+                
+                // 80% 이상의 신뢰도를 가졌을 때 동작 수행
+                if (highestProb > 0.8) {
+                    const classNameLower = highestClass.toLowerCase();
+                    
+                    // 등록된 얼굴 매칭 (집사, master, owner, user, jieun 등 포함)
+                    if (classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun')) {
+                        document.getElementById('gate-message').innerText = "🟢 출입 허가! 문이 열립니다.";
+                        document.getElementById('gate-message').style.color = '#9bbc0f';
+                        sendBLE('o'); // 문 열기 명령 'o' 전송
+                    } 
+                    // 미등록 외부인 감지 (외부인, stranger, unknown, background 등)
+                    else if (classNameLower.includes('외부인') || classNameLower.includes('stranger') || classNameLower.includes('unknown')) {
+                        document.getElementById('gate-message').innerText = "🚨 경고! 미등록 사용자 감지!";
+                        document.getElementById('gate-message').style.color = '#ff5e5e';
+                        sendBLE('a'); // 부저 경고음 명령 'a' 전송
+                    } else {
+                        document.getElementById('gate-message').innerText = "대상을 식별 중...";
+                        document.getElementById('gate-message').style.color = 'var(--screen-bg)';
+                    }
+                } else {
+                    document.getElementById('gate-message').innerText = "대상을 분석 중...";
+                    document.getElementById('gate-message').style.color = 'var(--screen-bg)';
+                }
+                
+            } catch (error) {
+                console.error("Prediction Error:", error);
             }
         }
     </script>

@@ -177,6 +177,24 @@ def on_rx(v):
         G.off()
         B.on()
     
+    # 'o' 수신 시: 서보 모터 180도 회전 (출입문 열기)
+    if v == 'o':
+        motor.move(180)
+
+    # 'c' 수신 시: 서보 모터 90도 회전 (출입문 닫기)
+    if v == 'c':
+        motor.move(90)
+
+    # 'a' 수신 시: 피에조 부저 경고음 재생
+    if v == 'a':
+        piezo.duty_u16(1000)
+        for _ in range(3):
+            piezo.freq(1200)
+            sleep(0.15)
+            piezo.freq(700)
+            sleep(0.15)
+        piezo.duty_u16(0)
+
     # '9' 수신 시: OLED에 Rilakkuma PBM 단색 비트맵 이미지 드로잉
     if v == '9':
         try:
