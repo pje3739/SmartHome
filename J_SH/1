@@ -651,6 +651,7 @@
                 <div class="lcd-screen" id="tamagotchi-lcd-screen">
                     <div class="screen-header">
                         <span id="display-pet-name">나비</span>
+                        <span id="touch-status" style="font-size: 10px; font-weight: bold; margin-left: auto; margin-right: 10px; color: var(--screen-dark);">상태: 평화로움</span>
                         <span id="ble-status-badge" class="status-badge disconnected">● 연결 대기</span>
                     </div>
 
