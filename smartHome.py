@@ -17,6 +17,7 @@ cds = ADC(Pin(36))
 cds.atten(ADC.ATTN_11DB)
 
 cds_flag = 0
+door_override = False
 
 # 서보 모터 초기화 (Servo Pin 13)
 motor = Servo(pin=13)
@@ -74,6 +75,7 @@ display2.show()
 
 # 블루투스 수신 이벤트 핸들러
 def on_rx(v): 
+    global door_override, cds_flag
     if isinstance(v, bytes):
         try:
             v = v.decode('utf-8')
@@ -177,13 +179,19 @@ def on_rx(v):
         G.off()
         B.on()
     
-    # 'o' 수신 시: 서보 모터 180도 회전 (출입문 열기)
+    # 'o' 수신 시: 서보 모터 180도 회전 (출입문 열기) 및 자동 조도 차단
     if v == 'o':
+        door_override = True
         motor.move(180)
 
-    # 'c' 수신 시: 서보 모터 90도 회전 (출입문 닫기)
+    # 'c' 수신 시: 서보 모터 90도 회전 (출입문 닫기) 및 자동 조도 차단
     if v == 'c':
+        door_override = True
         motor.move(90)
+
+    # 's' 수신 시: 조도 센서 창문 자동 제어 모드로 복구
+    if v == 's':
+        door_override = False
 
     # 'a' 수신 시: 피에조 부저 경고음 재생
     if v == 'a':
@@ -218,21 +226,22 @@ p.on_write(on_rx)
 
 # 메인 무한 루프
 while True:
-    # 조도 밝기 변화에 따른 모터 및 멜로디 동작
-    cds_value = cds.read()
-    
-    if cds_value > 4000 and cds_flag == 1:
-        piezo.duty_u16(1000)
-        for i in blindMelody:
-            piezo.freq(i)
-            sleep(0.3)
-        piezo.duty_u16(0) 
-        motor.move(180)
-        cds_flag = 0       
+    # 조도 밝기 변화에 따른 모터 및 멜로디 동작 (도어 오버라이드가 꺼져 있을 때만 실행)
+    if not door_override:
+        cds_value = cds.read()
         
-    elif cds_value <= 4000 and cds_flag == 0:
-        motor.move(90)
-        cds_flag = 1 
+        if cds_value > 4000 and cds_flag == 1:
+            piezo.duty_u16(1000)
+            for i in blindMelody:
+                piezo.freq(i)
+                sleep(0.3)
+            piezo.duty_u16(0) 
+            motor.move(180)
+            cds_flag = 0       
+            
+        elif cds_value <= 4000 and cds_flag == 0:
+            motor.move(90)
+            cds_flag = 1 
         
     # 터치 센서 접촉 감지에 따른 실시간 LED 점등 스위칭 (상승 에지 트리거 방식)
     t1 = touch1.value()

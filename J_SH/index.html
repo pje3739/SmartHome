@@ -129,6 +129,15 @@
             box-shadow: 2px 2px 0px #000;
         }
 
+        .kitsch-btn:disabled {
+            background: #ccc !important;
+            color: #888 !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            transform: none !important;
+            border-color: #777 !important;
+        }
+
         /* 홈 / 로그인 전용 스타일 */
         .home-logo {
             text-align: center;
@@ -764,8 +773,8 @@
                 
                 <!-- 수동 제어 버튼들 -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
-                    <button class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('o')">🔓 문 열기</button>
-                    <button class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('c')">🔒 문 닫기</button>
+                    <button id="gate-open-btn" class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('o')" disabled>🔓 문 열기</button>
+                    <button id="gate-close-btn" class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('c')" disabled>🔒 문 닫기</button>
                 </div>
                 <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;" onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
 
@@ -1285,6 +1294,10 @@
             document.getElementById('gate-message').style.color = 'var(--screen-bg)';
             document.getElementById('predict-result').innerText = "";
             
+            // 버튼 상태 비활성화 초기화
+            document.getElementById('gate-open-btn').disabled = true;
+            document.getElementById('gate-close-btn').disabled = true;
+            
             const btn = document.getElementById('start-cam-btn');
             btn.innerText = "📹 카메라 켜기 & 인식 시작";
             btn.style.background = 'var(--yellow)';
@@ -1318,23 +1331,27 @@
                 // 90% 이상의 신뢰도를 가졌을 때 동작 수행
                 if (highestProb > 0.9) {
                     const classNameLower = highestClass.toLowerCase();
+                    const isMe = classNameLower.includes('me') || classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun');
                     
-                    // 등록된 얼굴 매칭 (me, 집사, master, owner, user, jieun 등 포함)
-                    if (classNameLower.includes('me') || classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun')) {
-                        document.getElementById('gate-message').innerText = "🟢 출입 허가! 문이 열립니다.";
-                        document.getElementById('gate-message').style.color = '#9bbc0f';
+                    if (isMe) {
+                        // me가 90프로 이상이면 버튼 활성화 및 자동 열기 실행
+                        document.getElementById('gate-open-btn').disabled = false;
+                        document.getElementById('gate-close-btn').disabled = false;
+                        document.getElementById('gate-message').innerText = "🟢 집사 확인! 제어 버튼 활성화";
+                        document.getElementById('gate-message').style.color = '#0f380f'; // LCD 다크그린 색상
                         sendBLE('o'); // 문 열기 명령 'o' 전송
-                    } 
-                    // 미등록 외부인 감지 (외부인, stranger, unknown, background 등)
-                    else if (classNameLower.includes('외부인') || classNameLower.includes('stranger') || classNameLower.includes('unknown')) {
+                    } else {
+                        // !me (외부인 등)가 90프로 이상이면 버튼 비활성화 및 경고 부저음 울리기
+                        document.getElementById('gate-open-btn').disabled = true;
+                        document.getElementById('gate-close-btn').disabled = true;
                         document.getElementById('gate-message').innerText = "🚨 경고! 미등록 사용자 감지!";
                         document.getElementById('gate-message').style.color = '#ff5e5e';
                         sendBLE('a'); // 부저 경고음 명령 'a' 전송
-                    } else {
-                        document.getElementById('gate-message').innerText = "대상을 식별 중...";
-                        document.getElementById('gate-message').style.color = 'var(--screen-bg)';
                     }
                 } else {
+                    // 신뢰도가 낮으면 버튼 비활성화
+                    document.getElementById('gate-open-btn').disabled = true;
+                    document.getElementById('gate-close-btn').disabled = true;
                     document.getElementById('gate-message').innerText = "대상을 분석 중...";
                     document.getElementById('gate-message').style.color = 'var(--screen-bg)';
                 }
