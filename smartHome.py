@@ -82,20 +82,14 @@ def on_rx(v):
         except:
             pass
     print("Received:", v)
-    # '1' 수신 시: TV(LCD)에 현재 온습도 표시 및 웹 브라우저로 블루투스 송신
+    # '1' 수신 시: TV(LCD)에 현재 온습도 표시 및 웹 브라우저로 블루투스 송신 (센서 고장 시뮬레이션)
     if v == '1':
         lcd.clear()
-        print("1")
+        print("1 (Simulated Temp/Humi)")
         
-        # 온습도 측정
-        try:
-            d.measure()
-            temp = str(int(d.temperature()))
-            humi = str(int(d.humidity()))
-        except OSError as e:
-            print("DHT11 Sensor Error:", e)
-            temp = "0"
-            humi = "0"
+        import urandom
+        temp = str(urandom.randint(19, 29))
+        humi = str(urandom.randint(40, 70))
         lcd.clear()
         
         lcd.move_to(0, 0)
