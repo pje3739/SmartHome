@@ -773,8 +773,8 @@
                 
                 <!-- 수동 제어 버튼들 -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
-                    <button id="gate-open-btn" class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('o')" disabled>🔓 문 열기</button>
-                    <button id="gate-close-btn" class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('c')" disabled>🔒 문 닫기</button>
+                    <button id="gate-open-btn" class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="openDoorManually()" disabled>🔓 문 열기</button>
+                    <button id="gate-close-btn" class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="closeDoorManually()" disabled>🔒 문 닫기</button>
                 </div>
                 <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;" onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
 
@@ -795,6 +795,10 @@
         let isConnected = false;
         let isLedOn = true;
         let isLcdOn = true;
+
+        // 출입문 제어 딜레이 변수
+        let isAutoOpenPaused = false;
+        let autoOpenTimeout = null;
 
         const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
         const RX_UUID      = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
@@ -1334,12 +1338,18 @@
                     const isMe = classNameLower.includes('me') || classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun');
                     
                     if (isMe) {
-                        // me가 90프로 이상이면 버튼 활성화 및 자동 열기 실행
+                        // me가 90프로 이상이면 버튼 활성화
                         document.getElementById('gate-open-btn').disabled = false;
                         document.getElementById('gate-close-btn').disabled = false;
-                        document.getElementById('gate-message').innerText = "🟢 집사 확인! 제어 버튼 활성화";
-                        document.getElementById('gate-message').style.color = '#0f380f'; // LCD 다크그린 색상
-                        sendBLE('o'); // 문 열기 명령 'o' 전송
+                        
+                        // 자동 열기 일시정지 상태가 아닐 때만 문 열기 명령 전송
+                        if (!isAutoOpenPaused) {
+                            document.getElementById('gate-message').innerText = "🟢 집사 확인! 제어 버튼 활성화";
+                            document.getElementById('gate-message').style.color = '#0f380f'; // LCD 다크그린 색상
+                            sendBLE('o'); // 문 열기 명령 'o' 전송
+                        } else {
+                            document.getElementById('gate-message').innerText = "🟢 집사 감지 (자동열기 대기 중)";
+                        }
                     } else {
                         // !me (외부인 등)가 90프로 이상이면 버튼 비활성화 및 경고 부저음 울리기
                         document.getElementById('gate-open-btn').disabled = true;
@@ -1359,6 +1369,33 @@
             } catch (error) {
                 console.error("Prediction Error:", error);
             }
+        }
+
+        // 수동 문 열기 처리 (자동 열기 즉시 활성화)
+        function openDoorManually() {
+            sendBLE('o');
+            isAutoOpenPaused = false;
+            if (autoOpenTimeout) clearTimeout(autoOpenTimeout);
+            document.getElementById('gate-message').innerText = "🟢 문 열림 (수동)";
+            document.getElementById('gate-message').style.color = '#0f380f';
+            logTerminal('System', '수동으로 문을 열었습니다. 자동 열기가 재개됩니다.');
+        }
+
+        // 수동 문 닫기 처리 (5초간 자동 열기 일시 정지)
+        function closeDoorManually() {
+            sendBLE('c');
+            isAutoOpenPaused = true;
+            document.getElementById('gate-message').innerText = "🔒 문 닫힘 (5초 자동 열기 정지)";
+            document.getElementById('gate-message').style.color = '#ff5e5e';
+            logTerminal('System', '문을 닫았습니다. 5초간 자동 열기가 정지됩니다.');
+            
+            if (autoOpenTimeout) clearTimeout(autoOpenTimeout);
+            autoOpenTimeout = setTimeout(() => {
+                isAutoOpenPaused = false;
+                document.getElementById('gate-message').innerText = "인식 분석 대기...";
+                document.getElementById('gate-message').style.color = 'var(--screen-bg)';
+                logTerminal('System', '자동 열기 대기 상태가 복구되었습니다.');
+            }, 5000);
         }
     </script>
 </body>
