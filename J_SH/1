@@ -476,7 +476,7 @@
 
         /* 블루투스 연결 대기 오버레이 */
         .connection-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -485,8 +485,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
-            border-radius: 12px;
+            z-index: 1000;
             backdrop-filter: blur(8px);
             transition: all 0.3s ease;
         }
@@ -526,6 +525,18 @@
 </head>
 
 <body>
+    <!-- 글로벌 블루투스 연결 오버레이 -->
+    <div id="connection-overlay" class="connection-overlay" style="display: none;">
+        <div class="overlay-box">
+            <div class="overlay-title">⚠️ BLUETOOTH REQUIRED</div>
+            <div class="overlay-icon">🔌</div>
+            <p style="font-size: 13px; font-weight: bold; margin: 15px 0; line-height: 1.5;">
+                스마트홈 기기(ESP_eun)와<br>연결이 필요합니다.
+            </p>
+            <button class="kitsch-btn" style="background: var(--yellow);" onclick="connectBluetooth()">기기 검색 및 연결 ➔</button>
+            <button class="kitsch-btn" style="background: #fff; margin-top: 10px;" onclick="goToPage('page-home')">⬅ 홈으로 돌아가기</button>
+        </div>
+    </div>
 
     <!-- PAGE 1: 홈 / 로그인 화면 -->
     <div id="page-home" class="page active">
@@ -595,20 +606,7 @@
     <!-- PAGE 3: 스마트홈 제어 화면 (와이드 3열 레이아웃) -->
     <div id="page-smarthome" class="page-wide">
         
-        <!-- 블루투스 연결 오버레이 (비연결 상태일 때 전체 블러 및 차단) -->
-        <div id="connection-overlay" class="connection-overlay">
-            <div class="overlay-box">
-                <div class="overlay-title">⚠️ BLUETOOTH REQUIRED</div>
-                <div class="overlay-icon">🔌</div>
-                <p style="font-size: 13px; font-weight: bold; margin: 15px 0; line-height: 1.5;">
-                    스마트홈 기기(ESP_eun)와<br>연결이 필요합니다.
-                </p>
-                <button class="kitsch-btn" style="background: var(--yellow);" onclick="connectBluetooth()">기기 검색 및 연결 ➔</button>
-                <button class="kitsch-btn" style="background: #fff; margin-top: 10px;" onclick="goToPage('page-home')">⬅ 홈으로 돌아가기</button>
-            </div>
-        </div>
-
-        <div id="smarthome-dashboard" class="desktop-layout" style="filter: blur(5px);">
+        <div id="smarthome-dashboard" class="desktop-layout">
             
             <!-- Left Column: 온습도 제어 창 -->
             <div class="retro-window mint-theme">
@@ -738,39 +736,41 @@
 
     <!-- PAGE 4: 출입문 제어 시스템 화면 -->
     <div id="page-entrance" class="page">
-        <div class="tamagotchi-frame" style="max-width: 480px;">
-            <div class="title-banner" style="background: var(--purple); color: #fff;">🔒 SMART DOOR</div>
-            
-            <div class="input-group" style="text-align: left;">
-                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #000; padding-left: 5px;">티처블 머신 모델 URL:</label>
-                <input type="text" id="tm-url" class="pixel-input" placeholder="https://teachablemachine.withgoogle.com/models/xxxx/" value="">
-                <p style="font-size: 10px; color: #444; margin: 0 5px 8px 5px; line-height: 1.4;">
-                    * 팁: 본인이 학습하여 업로드한 모델 주소를 입력한 뒤 아래 [카메라 켜기]를 누르세요.
-                </p>
-            </div>
+        <div id="page-entrance-container" style="transition: filter 0.3s ease; width: 100%;">
+            <div class="tamagotchi-frame" style="max-width: 480px; margin: 0 auto;">
+                <div class="title-banner" style="background: var(--purple); color: #fff;">🔒 SMART DOOR</div>
+                
+                <div class="input-group" style="text-align: left;">
+                    <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #000; padding-left: 5px;">티처블 머신 모델 URL:</label>
+                    <input type="text" id="tm-url" class="pixel-input" placeholder="https://teachablemachine.withgoogle.com/models/xxxx/" value="">
+                    <p style="font-size: 10px; color: #444; margin: 0 5px 8px 5px; line-height: 1.4;">
+                        * 팁: 본인이 학습하여 업로드한 모델 주소를 입력한 뒤 아래 [카메라 켜기]를 누르세요.
+                    </p>
+                </div>
 
-            <!-- 상태 및 메세지 표시 LCD -->
-            <div id="entrance-status" class="lcd-screen" style="background: #0f380f; color: #9bbc0f; padding: 12px; border-radius: 10px; text-align: center; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #000;">
-                <span id="gate-message" style="font-size: 15px; font-weight: bold;">카메라 대기 중...</span>
-                <span id="predict-result" style="font-size: 12px; margin-top: 6px; color: var(--screen-light);"></span>
-            </div>
+                <!-- 상태 및 메세지 표시 LCD -->
+                <div id="entrance-status" class="lcd-screen" style="background: #0f380f; color: #9bbc0f; padding: 12px; border-radius: 10px; text-align: center; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #000;">
+                    <span id="gate-message" style="font-size: 15px; font-weight: bold;">카메라 대기 중...</span>
+                    <span id="predict-result" style="font-size: 12px; margin-top: 6px; color: var(--screen-light);"></span>
+                </div>
 
-            <!-- 웹캠 영상 박스 -->
-            <div id="webcam-container" style="border: 4px solid #000; border-radius: 15px; overflow: hidden; position: relative; width: 100%; height: 220px; background: #222; margin: 15px 0; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 0px #000;">
-                <video id="webcam-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1);"></video>
-                <span id="webcam-placeholder" style="color: #666; font-size: 13px;">📹 카메라가 꺼져 있습니다.</span>
-            </div>
+                <!-- 웹캠 영상 박스 -->
+                <div id="webcam-container" style="border: 4px solid #000; border-radius: 15px; overflow: hidden; position: relative; width: 100%; height: 220px; background: #222; margin: 15px 0; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 0px #000;">
+                    <video id="webcam-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1);"></video>
+                    <span id="webcam-placeholder" style="color: #666; font-size: 13px;">📹 카메라가 꺼져 있습니다.</span>
+                </div>
 
-            <button id="start-cam-btn" class="kitsch-btn" style="background: var(--yellow);" onclick="startEntranceCamera()">📹 카메라 켜기 & 인식 시작</button>
-            
-            <!-- 수동 제어 버튼들 -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
-                <button class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('o')">🔓 문 열기</button>
-                <button class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('c')">🔒 문 닫기</button>
-            </div>
-            <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;" onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
+                <button id="start-cam-btn" class="kitsch-btn" style="background: var(--yellow);" onclick="startEntranceCamera()">📹 카메라 켜기 & 인식 시작</button>
+                
+                <!-- 수동 제어 버튼들 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                    <button class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('o')">🔓 문 열기</button>
+                    <button class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="sendBLE('c')">🔒 문 닫기</button>
+                </div>
+                <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;" onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
 
-            <button class="kitsch-btn" style="background: #fff; margin-top: 15px;" onclick="stopEntranceCamera(); goToPage('page-home')">⬅ 홈으로 돌아가기</button>
+                <button class="kitsch-btn" style="background: #fff; margin-top: 15px;" onclick="stopEntranceCamera(); goToPage('page-home')">⬅ 홈으로 돌아가기</button>
+            </div>
         </div>
     </div>
 
@@ -801,15 +801,23 @@
             document.querySelectorAll('.page, .page-wide').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
 
-            // 스마트홈 탭 진입 시 연결 안 되어있으면 오버레이 표시
-            if (pageId === 'page-smarthome') {
+            // 스마트홈 또는 출입문 진입 시 연결 안 되어있으면 글로벌 오버레이 표시
+            if (pageId === 'page-smarthome' || pageId === 'page-entrance') {
+                const overlay = document.getElementById('connection-overlay');
                 if (isConnected) {
-                    document.getElementById('connection-overlay').style.display = 'none';
+                    overlay.style.display = 'none';
                     document.getElementById('smarthome-dashboard').style.filter = 'none';
+                    const entContainer = document.getElementById('page-entrance-container');
+                    if (entContainer) entContainer.style.filter = 'none';
                 } else {
-                    document.getElementById('connection-overlay').style.display = 'flex';
+                    overlay.style.display = 'flex';
                     document.getElementById('smarthome-dashboard').style.filter = 'blur(5px)';
+                    const entContainer = document.getElementById('page-entrance-container');
+                    if (entContainer) entContainer.style.filter = 'blur(5px)';
                 }
+            } else {
+                // 홈/캐릭터 페이지 등으로 이동 시 오버레이 숨기기
+                document.getElementById('connection-overlay').style.display = 'none';
             }
         }
 
@@ -911,6 +919,8 @@
                 // 연결 오버레이 숨기기 및 대시보드 언블러
                 document.getElementById('connection-overlay').style.display = 'none';
                 document.getElementById('smarthome-dashboard').style.filter = 'none';
+                const entContainer = document.getElementById('page-entrance-container');
+                if (entContainer) entContainer.style.filter = 'none';
 
                 // 기기 연결 시 기본 센서 상태 자동 조회
                 queryAllSensors();
@@ -933,6 +943,8 @@
             // 오버레이 복구 및 대시보드 블러 처리
             document.getElementById('connection-overlay').style.display = 'flex';
             document.getElementById('smarthome-dashboard').style.filter = 'blur(5px)';
+            const entContainer = document.getElementById('page-entrance-container');
+            if (entContainer) entContainer.style.filter = 'blur(5px)';
         }
 
         // 연결 끊고 메인 화면으로 이동
