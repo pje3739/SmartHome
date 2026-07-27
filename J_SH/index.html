@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/neodunggeunmo/neodunggeunmo@v1.5.0/neodunggeunmo.css">
     <!-- TensorFlow.js & Teachable Machine Image 라이브러리 CDN 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <style>
         :root {
             --bg-color: #ffd1dc;
@@ -147,8 +148,13 @@
         }
 
         @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-10px);
+            }
         }
 
         /* 메인 네비게이션 메뉴 */
@@ -274,9 +280,17 @@
         }
 
         @keyframes walkBounce {
-            0% { transform: translateX(-40px) translateY(0); }
-            50% { transform: translateX(0) translateY(-8px); }
-            100% { transform: translateX(40px) translateY(0); }
+            0% {
+                transform: translateX(-40px) translateY(0);
+            }
+
+            50% {
+                transform: translateX(0) translateY(-8px);
+            }
+
+            100% {
+                transform: translateX(40px) translateY(0);
+            }
         }
 
         .screen-footer {
@@ -320,9 +334,17 @@
             box-shadow: 0px 1px 0px #000;
         }
 
-        .phy-btn.yellow { background: var(--yellow); }
-        .phy-btn.mint { background: var(--mint); }
-        .phy-btn.purple { background: var(--purple); }
+        .phy-btn.yellow {
+            background: var(--yellow);
+        }
+
+        .phy-btn.mint {
+            background: var(--mint);
+        }
+
+        .phy-btn.purple {
+            background: var(--purple);
+        }
 
         .btn-label {
             font-size: 9px;
@@ -344,9 +366,17 @@
             flex-direction: column;
         }
 
-        .retro-window.pink-theme .window-titlebar { background: var(--main-pink); }
-        .retro-window.purple-theme .window-titlebar { background: var(--purple); }
-        .retro-window.mint-theme .window-titlebar { background: var(--mint); }
+        .retro-window.pink-theme .window-titlebar {
+            background: var(--main-pink);
+        }
+
+        .retro-window.purple-theme .window-titlebar {
+            background: var(--purple);
+        }
+
+        .retro-window.mint-theme .window-titlebar {
+            background: var(--mint);
+        }
 
         .window-titlebar {
             color: #000;
@@ -478,10 +508,21 @@
             box-shadow: 1px 1px 0px #000;
         }
 
-        .status-badge.disconnected { background: #ff8b8b; }
-        .status-badge.scanning { background: var(--yellow); }
-        .status-badge.connecting { background: #ffb84d; }
-        .status-badge.connected { background: var(--mint); }
+        .status-badge.disconnected {
+            background: #ff8b8b;
+        }
+
+        .status-badge.scanning {
+            background: var(--yellow);
+        }
+
+        .status-badge.connecting {
+            background: #ffb84d;
+        }
+
+        .status-badge.connected {
+            background: var(--mint);
+        }
 
         /* 블루투스 연결 대기 오버레이 */
         .connection-overlay {
@@ -527,8 +568,13 @@
         }
 
         @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.15); }
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.15);
+            }
         }
     </style>
 </head>
@@ -542,8 +588,10 @@
             <p style="font-size: 13px; font-weight: bold; margin: 15px 0; line-height: 1.5;">
                 스마트홈 기기(ESP_eun)와<br>연결이 필요합니다.
             </p>
-            <button class="kitsch-btn" style="background: var(--yellow);" onclick="connectBluetooth()">기기 검색 및 연결 ➔</button>
-            <button class="kitsch-btn" style="background: #fff; margin-top: 10px;" onclick="goToPage('page-home')">⬅ 홈으로 돌아가기</button>
+            <button class="kitsch-btn" style="background: var(--yellow);" onclick="connectBluetooth()">기기 검색 및 연결
+                ➔</button>
+            <button class="kitsch-btn" style="background: #fff; margin-top: 10px;" onclick="goToPage('page-home')">⬅ 홈으로
+                돌아가기</button>
         </div>
     </div>
 
@@ -572,7 +620,8 @@
                         캐릭터 선택 / 변경하기</button>
                     <button class="kitsch-btn" style="background: var(--mint);" onclick="goToPage('page-smarthome')">🏠
                         스마트홈 제어판 입장</button>
-                    <button class="kitsch-btn" style="background: var(--purple); color: #fff;" onclick="goToPage('page-entrance')">🚪
+                    <button class="kitsch-btn" style="background: var(--purple); color: #fff;"
+                        onclick="goToPage('page-entrance')">🚪
                         출입문 제어 시스템 입장</button>
                     <button class="kitsch-btn" style="background: #ff8b8b; color: #fff;" onclick="handleLogout()">🔒
                         로그아웃</button>
@@ -614,9 +663,9 @@
 
     <!-- PAGE 3: 스마트홈 제어 화면 (와이드 3열 레이아웃) -->
     <div id="page-smarthome" class="page-wide">
-        
+
         <div id="smarthome-dashboard" class="desktop-layout">
-            
+
             <!-- Left Column: 온습도 제어 창 -->
             <div class="retro-window mint-theme">
                 <div class="window-titlebar">
@@ -627,18 +676,68 @@
                     <!-- 1. 온도 -->
                     <div class="control-item">
                         <label>🌡️ 실시간 온도 <span id="temp-val" class="val-display">--°C</span></label>
-                        <div style="background: #eee; border: 2px solid #000; height: 16px; border-radius: 8px; overflow: hidden; margin: 8px 0 6px 0;">
-                            <div id="temp-bar" style="background: var(--main-pink); width: 0%; height: 100%; transition: width 0.5s;"></div>
+                        <div
+                            style="background: #eee; border: 2px solid #000; height: 16px; border-radius: 8px; overflow: hidden; margin: 8px 0 6px 0;">
+                            <div id="temp-bar"
+                                style="background: var(--main-pink); width: 0%; height: 100%; transition: width 0.5s;">
+                            </div>
                         </div>
                     </div>
 
                     <!-- 2. 습도 -->
                     <div class="control-item">
                         <label>💧 실시간 습도 <span id="humidity-val" class="val-display">--%</span></label>
-                        <div style="background: #eee; border: 2px solid #000; height: 16px; border-radius: 8px; overflow: hidden; margin: 8px 0 10px 0;">
-                            <div id="humidity-bar" style="background: var(--purple); width: 0%; height: 100%; transition: width 0.5s;"></div>
+                        <div
+                            style="background: #eee; border: 2px solid #000; height: 16px; border-radius: 8px; overflow: hidden; margin: 8px 0 10px 0;">
+                            <div id="humidity-bar"
+                                style="background: var(--purple); width: 0%; height: 100%; transition: width 0.5s;">
+                            </div>
                         </div>
-                        <button class="kitsch-btn" style="background: var(--mint); padding: 8px; font-size: 13px; margin: 0;" onclick="sendBLE('1')">온습도 측정 요청 🔄</button>
+                        <button class="kitsch-btn"
+                            style="background: var(--mint); padding: 8px; font-size: 13px; margin: 0;"
+                            onclick="sendBLE('1')">온습도 측정 요청 🔄</button>
+                    </div>
+
+                    <!-- 6. 액츄에이터 액션 그룹 (오른쪽에서 이동됨) -->
+                    <div class="control-item">
+                        <label>🔊 부저 & OLED 제어</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('5')">학교종 🎵</button>
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('6')">작은별 🌟</button>
+                        </div>
+                        <button class="toggle-btn"
+                            style="font-size: 11px; padding: 6px; margin-top: 6px; background: var(--purple); color: #fff;"
+                            onclick="sendBLE('9')">OLED 캐릭터 출력 🖼️</button>
+                    </div>
+
+                    <!-- 8. 부저 알람 예약 시스템 (오른쪽에서 이동됨) -->
+                    <div class="control-item" style="text-align: left;">
+                        <label>⏰ 부저 멜로디 알람 예약</label>
+
+                        <!-- 학교종 알람 -->
+                        <div
+                            style="margin: 6px 0; border-bottom: 1px dashed #ccc; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px;">점심🎵</span>
+                            <div>
+                                <input type="time" id="alarm-5-time" class="pixel-input"
+                                    style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
+                                <button id="alarm-5-toggle" class="toggle-btn off"
+                                    style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;"
+                                    onclick="toggleAlarm(5)">OFF</button>
+                            </div>
+                        </div>
+
+                        <!-- 작은별 알람 -->
+                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px;">저녁🌟</span>
+                            <div>
+                                <input type="time" id="alarm-6-time" class="pixel-input"
+                                    style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
+                                <button id="alarm-6-toggle" class="toggle-btn off"
+                                    style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;"
+                                    onclick="toggleAlarm(6)">OFF</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -646,12 +745,14 @@
             <!-- Center Column: 다마고치 기기 -->
             <div class="tamagotchi-device">
                 <div class="tamagotchi-decorations">★ JIEUN'S HOME ★</div>
-                
+
                 <!-- LCD 뷰파인더 스크린 -->
                 <div class="lcd-screen" id="tamagotchi-lcd-screen">
                     <div class="screen-header">
                         <span id="display-pet-name">나비</span>
-                        <span id="touch-status" style="font-size: 10px; font-weight: bold; margin-left: auto; margin-right: 10px; color: var(--screen-dark);">상태: 평화로움</span>
+                        <span id="touch-status"
+                            style="font-size: 10px; font-weight: bold; margin-left: auto; margin-right: 10px; color: var(--screen-dark);">상태:
+                            평화로움</span>
                         <span id="ble-status-badge" class="status-badge disconnected">● 연결 대기</span>
                     </div>
 
@@ -659,7 +760,7 @@
                     <div class="pet-stage">
                         <div id="pet-avatar-display" class="pet-display">🐱</div>
                     </div>
-                    
+
                     <!-- LCD 하단 온습도 연동 정보 -->
                     <div class="screen-footer">
                         <span>T: <span id="lcd-temp-val">--°C</span></span>
@@ -701,58 +802,35 @@
                     <!-- 4. LCD 백라이트 제어 -->
                     <div class="control-item">
                         <label>📺 I2C LCD 백라이트</label>
-                        <button id="lcd-backlight-btn" class="toggle-btn" onclick="toggleLCDBacklight()">백라이트: ON</button>
+                        <button id="lcd-backlight-btn" class="toggle-btn" onclick="toggleLCDBacklight()">백라이트:
+                            ON</button>
                     </div>
 
                     <!-- 5. 조도 센서값 모니터링 -->
                     <div class="control-item">
                         <label>☀️ 실시간 조도 <span id="light-val" class="val-display">--</span></label>
-                        <div style="background: #eee; border: 2px solid #000; height: 16px; border-radius: 8px; overflow: hidden; margin: 8px 0 10px 0;">
-                            <div id="light-bar" style="background: var(--yellow); width: 0%; height: 100%; transition: width 0.5s;"></div>
+                        <div
+                            style="background: #eee; border: 2px solid #000; height: 16px; border-radius: 8px; overflow: hidden; margin: 8px 0 10px 0;">
+                            <div id="light-bar"
+                                style="background: var(--yellow); width: 0%; height: 100%; transition: width 0.5s;">
+                            </div>
                         </div>
-                        <button class="kitsch-btn" style="background: var(--purple); color: #fff; padding: 8px; font-size: 13px; margin: 0;" onclick="sendBLE('2')">조도 측정 요청 🔄</button>
-                    </div>
-
-                    <!-- 6. 액츄에이터 액션 그룹 -->
-                    <div class="control-item">
-                        <label>🔊 부저 & OLED 제어</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('5')">학교종 🎵</button>
-                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('6')">작은별 🌟</button>
-                        </div>
-                        <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin-top: 6px; background: var(--purple); color: #fff;" onclick="sendBLE('9')">OLED 캐릭터 출력 🖼️</button>
+                        <button class="kitsch-btn"
+                            style="background: var(--purple); color: #fff; padding: 8px; font-size: 13px; margin: 0;"
+                            onclick="sendBLE('2')">조도 측정 요청 🔄</button>
                     </div>
 
                     <!-- 7. 다마고치 배경 변경 -->
                     <div class="control-item">
                         <label>🖼️ 다마고치 LCD 배경 이미지</label>
-                        <input type="file" id="bg-upload-input" accept="image/*" style="display: none;" onchange="changeTamagotchiBg(this)">
+                        <input type="file" id="bg-upload-input" accept="image/*" style="display: none;"
+                            onchange="changeTamagotchiBg(this)">
                         <div style="display: flex; gap: 6px; margin-top: 6px;">
-                            <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0;" onclick="document.getElementById('bg-upload-input').click()">이미지 업로드 📂</button>
-                            <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0; background: #ff8b8b; color: #fff;" onclick="resetTamagotchiBg()">기본 배경 🔄</button>
-                        </div>
-                    </div>
-
-                    <!-- 8. 부저 알람 예약 시스템 -->
-                    <div class="control-item" style="text-align: left;">
-                        <label>⏰ 부저 멜로디 알람 예약</label>
-                        
-                        <!-- 학교종 알람 -->
-                        <div style="margin: 6px 0; border-bottom: 1px dashed #ccc; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px;">학교종 🎵</span>
-                            <div>
-                                <input type="time" id="alarm-5-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
-                                <button id="alarm-5-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(5)">OFF</button>
-                            </div>
-                        </div>
-
-                        <!-- 작은별 알람 -->
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px;">작은별 🌟</span>
-                            <div>
-                                <input type="time" id="alarm-6-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
-                                <button id="alarm-6-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(6)">OFF</button>
-                            </div>
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0;"
+                                onclick="document.getElementById('bg-upload-input').click()">이미지 업로드 📂</button>
+                            <button class="toggle-btn"
+                                style="font-size: 11px; padding: 6px; margin: 0; background: #ff8b8b; color: #fff;"
+                                onclick="resetTamagotchiBg()">기본 배경 🔄</button>
                         </div>
                     </div>
                 </div>
@@ -762,9 +840,12 @@
             <div class="retro-window terminal-theme" style="max-width: 100%; grid-column: 1 / -1; margin-top: 5px;">
                 <div class="window-titlebar" style="background: #222; color: #fff;">
                     <span class="window-title" style="color: #39ff14;">🖥️ BLE TERMINAL LOG (디버깅)</span>
-                    <button onclick="clearTerminal()" style="background: var(--yellow); border: 2px solid #000; border-radius: 4px; padding: 1px 6px; font-size: 10px; cursor: pointer; font-weight: bold;">CLEAR</button>
+                    <button onclick="clearTerminal()"
+                        style="background: var(--yellow); border: 2px solid #000; border-radius: 4px; padding: 1px 6px; font-size: 10px; cursor: pointer; font-weight: bold;">CLEAR</button>
                 </div>
-                <div class="window-body" style="background: #151515; color: #39ff14; font-family: 'JetBrains Mono', monospace; padding: 10px; height: 120px; overflow-y: auto; font-size: 12px; border-radius: 0; text-align: left; border: none;" id="terminal-log">
+                <div class="window-body"
+                    style="background: #151515; color: #39ff14; font-family: 'JetBrains Mono', monospace; padding: 10px; height: 120px; overflow-y: auto; font-size: 12px; border-radius: 0; text-align: left; border: none;"
+                    id="terminal-log">
                     [System] Welcome! Please connect your ESP32 Bluetooth device.
                 </div>
             </div>
@@ -772,9 +853,12 @@
         </div>
 
         <!-- 하단 공통 네비게이션 버튼 -->
-        <div class="bottom-menu" style="display: flex; gap: 15px; margin-top: 25px; width: 100%; justify-content: center;">
-            <button class="kitsch-btn" style="background: var(--yellow); max-width: 180px; margin: 0;" onclick="goToPage('page-select')">⚡ 캐릭터 변경</button>
-            <button class="kitsch-btn" style="background: #fff; max-width: 180px; margin: 0;" onclick="handleDisconnectAndExit()">🔌 연결해제 & 홈</button>
+        <div class="bottom-menu"
+            style="display: flex; gap: 15px; margin-top: 25px; width: 100%; justify-content: center;">
+            <button class="kitsch-btn" style="background: var(--yellow); max-width: 180px; margin: 0;"
+                onclick="goToPage('page-select')">⚡ 캐릭터 변경</button>
+            <button class="kitsch-btn" style="background: #fff; max-width: 180px; margin: 0;"
+                onclick="handleDisconnectAndExit()">🔌 연결해제 & 홈</button>
         </div>
     </div>
 
@@ -783,37 +867,51 @@
         <div id="page-entrance-container" style="transition: filter 0.3s ease; width: 100%;">
             <div class="tamagotchi-frame" style="max-width: 480px; margin: 0 auto;">
                 <div class="title-banner" style="background: var(--purple); color: #fff;">🔒 SMART DOOR</div>
-                
+
                 <div class="input-group" style="text-align: left;">
-                    <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #000; padding-left: 5px;">티처블 머신 모델 URL:</label>
-                    <input type="text" id="tm-url" class="pixel-input" placeholder="https://teachablemachine.withgoogle.com/models/xxxx/" value="">
+                    <label
+                        style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #000; padding-left: 5px;">티처블
+                        머신 모델 URL:</label>
+                    <input type="text" id="tm-url" class="pixel-input"
+                        placeholder="https://teachablemachine.withgoogle.com/models/xxxx/" value="">
                     <p style="font-size: 10px; color: #444; margin: 0 5px 8px 5px; line-height: 1.4;">
                         * 팁: 본인이 학습하여 업로드한 모델 주소를 입력한 뒤 아래 [카메라 켜기]를 누르세요.
                     </p>
                 </div>
 
                 <!-- 상태 및 메세지 표시 LCD -->
-                <div id="entrance-status" class="lcd-screen" style="background: #0f380f; color: #9bbc0f; padding: 12px; border-radius: 10px; text-align: center; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #000;">
+                <div id="entrance-status" class="lcd-screen"
+                    style="background: #0f380f; color: #9bbc0f; padding: 12px; border-radius: 10px; text-align: center; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #000;">
                     <span id="gate-message" style="font-size: 15px; font-weight: bold;">카메라 대기 중...</span>
-                    <span id="predict-result" style="font-size: 12px; margin-top: 6px; color: var(--screen-light);"></span>
+                    <span id="predict-result"
+                        style="font-size: 12px; margin-top: 6px; color: var(--screen-light);"></span>
                 </div>
 
                 <!-- 웹캠 영상 박스 -->
-                <div id="webcam-container" style="border: 4px solid #000; border-radius: 15px; overflow: hidden; position: relative; width: 100%; height: 220px; background: #222; margin: 15px 0; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 0px #000;">
-                    <video id="webcam-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1);"></video>
+                <div id="webcam-container"
+                    style="border: 4px solid #000; border-radius: 15px; overflow: hidden; position: relative; width: 100%; height: 220px; background: #222; margin: 15px 0; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 0px #000;">
+                    <video id="webcam-video" autoplay playsinline muted
+                        style="width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1);"></video>
                     <span id="webcam-placeholder" style="color: #666; font-size: 13px;">📹 카메라가 꺼져 있습니다.</span>
                 </div>
 
-                <button id="start-cam-btn" class="kitsch-btn" style="background: var(--yellow);" onclick="startEntranceCamera()">📹 카메라 켜기 & 인식 시작</button>
-                
+                <button id="start-cam-btn" class="kitsch-btn" style="background: var(--yellow);"
+                    onclick="startEntranceCamera()">📹 카메라 켜기 & 인식 시작</button>
+
                 <!-- 수동 제어 버튼들 -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
-                    <button id="gate-open-btn" class="kitsch-btn" style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;" onclick="openDoorManually()" disabled>🔓 문 열기</button>
-                    <button id="gate-close-btn" class="kitsch-btn" style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;" onclick="closeDoorManually()" disabled>🔒 문 닫기</button>
+                    <button id="gate-open-btn" class="kitsch-btn"
+                        style="background: var(--mint); margin: 0; padding: 10px; font-size: 13px;"
+                        onclick="openDoorManually()" disabled>🔓 문 열기</button>
+                    <button id="gate-close-btn" class="kitsch-btn"
+                        style="background: #ff8b8b; margin: 0; padding: 10px; font-size: 13px;"
+                        onclick="closeDoorManually()" disabled>🔒 문 닫기</button>
                 </div>
-                <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;" onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
+                <button class="kitsch-btn" style="background: #eee; font-size: 13px; margin-top: 10px;"
+                    onclick="sendBLE('a')">🚨 경고용 부저 테스트</button>
 
-                <button class="kitsch-btn" style="background: #fff; margin-top: 15px;" onclick="stopEntranceCamera(); goToPage('page-home')">⬅ 홈으로 돌아가기</button>
+                <button class="kitsch-btn" style="background: #fff; margin-top: 15px;"
+                    onclick="stopEntranceCamera(); goToPage('page-home')">⬅ 홈으로 돌아가기</button>
             </div>
         </div>
     </div>
@@ -822,7 +920,7 @@
         // 상태 관리 변수
         let isLoggedIn = false;
         let selectedPet = { type: '고양이', icon: '🐱' };
-        
+
         // BLE 통신 변수
         let bluetoothDevice = null;
         let rxCharacteristic = null;
@@ -839,8 +937,8 @@
         let sensorInterval = null;
 
         const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-        const RX_UUID      = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
-        const TX_UUID      = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+        const RX_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+        const TX_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 
         // 페이지 이동 제어 함수
         function goToPage(pageId) {
@@ -937,7 +1035,7 @@
         async function connectBluetooth() {
             updateStatusBadge('스캔 중...', 'scanning');
             logTerminal('System', 'Scanning for Bluetooth devices (Prefix: ESP_)...');
-            
+
             try {
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
                     filters: [
@@ -952,10 +1050,10 @@
 
                 const server = await bluetoothDevice.gatt.connect();
                 logTerminal('System', 'GATT Server Connected. Fetching primary service...');
-                
+
                 const service = await server.getPrimaryService(SERVICE_UUID);
                 logTerminal('System', 'Primary Service obtained. Getting characteristics...');
-                
+
                 rxCharacteristic = await service.getCharacteristic(RX_UUID);
                 txCharacteristic = await service.getCharacteristic(TX_UUID);
 
@@ -1043,16 +1141,16 @@
             const value = event.target.value;
             const decoder = new TextDecoder('utf-8');
             const chunk = decoder.decode(value);
-            
+
             rxBuffer += chunk;
-            
+
             let lines = rxBuffer.split('\n');
             rxBuffer = lines.pop(); // 줄바꿈이 아직 없는 부분은 버퍼에 보관
-            
+
             for (let line of lines) {
                 line = line.trim();
                 if (line.length === 0) continue;
-                
+
                 logTerminal('RX', line);
                 parseIncomingMessage(line);
             }
@@ -1070,11 +1168,11 @@
                     // 16~30도 범위를 프로그레스바로 매핑
                     const pct = Math.min(100, Math.max(0, ((temp - 16) / 14) * 100));
                     document.getElementById('temp-bar').style.width = pct + '%';
-                    
+
                     // 캐릭터별 온도 자동화 로직 호출
                     checkTempLEDAutomation(temp);
                 }
-            } 
+            }
             else if (msg.includes('humi')) {
                 const match = msg.match(/humi\s*:\s*(\d+)/);
                 if (match) {
@@ -1083,13 +1181,13 @@
                     document.getElementById('lcd-humid-val').innerText = humi + '%';
                     document.getElementById('humidity-bar').style.width = humi + '%';
                 }
-            } 
+            }
             // 조도 조회 ('2'에 대한 피드백): 숫자로만 오는 데이터 (예: "320")
             else if (/^\d+$/.test(msg)) {
                 const lightVal = parseInt(msg);
                 document.getElementById('light-val').innerText = lightVal;
                 document.getElementById('lcd-light-val').innerText = lightVal;
-                
+
                 // ESP32 ADC 값 범위(0~4095)를 인버트하여 100% 비율로 환산 (밝을수록 바가 꽉참)
                 const brightPercent = Math.min(100, Math.max(0, 100 - (lightVal / 4095) * 100));
                 document.getElementById('light-bar').style.width = brightPercent + '%';
@@ -1107,10 +1205,10 @@
         // 캐릭터별 온도 연동 LED 제어 자동화 함수
         function checkTempLEDAutomation(temp) {
             if (!isConnected) return;
-            
+
             const petType = selectedPet.type; // '고양이', '강아지', '햄스터'
             let color = null; // 'red', 'blue', or null
-            
+
             if (petType === '강아지') {
                 if (temp >= 26) {
                     color = 'red';
@@ -1130,7 +1228,7 @@
                     color = 'blue';
                 }
             }
-            
+
             if (color === 'red') {
                 sendBLE('r'); // 빨간색 LED 명령 'r' 송신
                 updateVirtualLED('red');
@@ -1146,7 +1244,7 @@
         function updateVirtualLED(color) {
             const btn = document.getElementById('led-btn');
             const lcdLed = document.getElementById('lcd-led-val');
-            
+
             if (color === 'red') {
                 if (btn) {
                     btn.innerText = "자동: 빨간색";
@@ -1181,7 +1279,7 @@
             isLedOn = !isLedOn;
             const btn = document.getElementById('led-btn');
             const lcdLed = document.getElementById('lcd-led-val');
-            
+
             if (isLedOn) {
                 sendBLE('7'); // LED 켜기
                 if (btn) {
@@ -1203,7 +1301,7 @@
         function toggleLCDBacklight() {
             isLcdOn = !isLcdOn;
             const btn = document.getElementById('lcd-backlight-btn');
-            
+
             if (isLcdOn) {
                 sendBLE('3'); // 백라이트 ON
                 if (btn) {
@@ -1243,31 +1341,31 @@
         function spawnHearts() {
             const stage = document.querySelector('.pet-stage');
             if (!stage) return;
-            
+
             const heartIcons = ['❤️', '💖', '💝', '💕', '💗'];
             for (let i = 0; i < 6; i++) {
                 const heart = document.createElement('div');
                 heart.innerText = heartIcons[Math.floor(Math.random() * heartIcons.length)];
                 heart.style.position = 'absolute';
                 heart.style.fontSize = `${Math.floor(Math.random() * 12) + 16}px`; // 16~28px
-                
+
                 // 캐릭터 중심(-25px ~ +25px) 주변에 랜덤 분사
                 const randomX = Math.floor(Math.random() * 50) - 25;
-                const delay = Math.random() * 300; 
-                
+                const delay = Math.random() * 300;
+
                 heart.style.left = `calc(50% + ${randomX}px - 10px)`;
                 heart.style.bottom = '20px';
                 heart.style.opacity = '1';
                 heart.style.pointerEvents = 'none';
                 heart.style.transition = 'all 1.2s ease-out';
-                
+
                 stage.appendChild(heart);
-                
+
                 setTimeout(() => {
                     heart.style.transform = `translateY(-70px) scale(1.3)`;
                     heart.style.opacity = '0';
                 }, delay);
-                
+
                 // 애니메이션 완료 후 제거
                 setTimeout(() => {
                     heart.remove();
@@ -1279,7 +1377,7 @@
         function changeTamagotchiBg(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const lcd = document.getElementById('tamagotchi-lcd-screen');
                     if (lcd) {
                         lcd.style.backgroundImage = `url(${e.target.result})`;
@@ -1310,19 +1408,19 @@
         function logTerminal(direction, message) {
             const logEl = document.getElementById('terminal-log');
             if (!logEl) return;
-            
+
             const time = new Date().toLocaleTimeString();
             let badgeColor = '#39ff14'; // RX: 초록
             if (direction === 'TX') badgeColor = '#ffe66d'; // TX: 노랑
             if (direction === 'System') badgeColor = '#00ffff'; // System: 하늘
             if (direction === 'Error') badgeColor = '#ff5e5e'; // Error: 빨강
-            
+
             const logLine = `<div style="margin-bottom: 4px;">
                 <span style="color: #888;">[${time}]</span> 
                 <span style="color: ${badgeColor}; font-weight: bold;">[${direction}]</span> 
                 <span>${message}</span>
             </div>`;
-            
+
             logEl.innerHTML += logLine;
             logEl.scrollTop = logEl.scrollHeight;
         }
@@ -1350,46 +1448,46 @@
                 alert("티처블 머신 모델 URL을 입력해 주세요!\n(예: https://teachablemachine.withgoogle.com/models/xxxx/)");
                 return;
             }
-            
+
             let modelURL = modelUrlInput;
             if (!modelURL.endsWith('/')) {
                 modelURL += '/';
             }
-            
+
             document.getElementById('gate-message').innerText = "모델 로드 중...";
             logTerminal('System', 'Loading Teachable Machine model from: ' + modelURL);
-            
+
             try {
                 const checkpointURL = modelURL + 'model.json';
                 const metadataURL = modelURL + 'metadata.json';
-                
+
                 tmModel = await tmImage.load(checkpointURL, metadataURL);
                 const maxPredictions = tmModel.getTotalClasses();
                 logTerminal('System', `Model loaded! Classes: ${maxPredictions}`);
-                
+
                 // 웹캠 활성화
                 document.getElementById('gate-message').innerText = "카메라 초기화 중...";
                 const video = document.getElementById('webcam-video');
                 const placeholder = document.getElementById('webcam-placeholder');
-                
+
                 webcamStream = await navigator.mediaDevices.getUserMedia({
                     video: { width: 320, height: 240, facingMode: 'user' },
                     audio: false
                 });
-                
+
                 video.srcObject = webcamStream;
                 video.style.display = 'block';
                 placeholder.style.display = 'none';
-                
+
                 document.getElementById('gate-message').innerText = "인식 분석 대기...";
                 document.getElementById('start-cam-btn').innerText = "🛑 인식 종료하기";
                 document.getElementById('start-cam-btn').style.background = '#ff8b8b';
                 document.getElementById('start-cam-btn').onclick = stopEntranceCamera;
-                
+
                 isPredicting = true;
                 // 800ms 간격으로 예측 루프 실행
                 predictionInterval = setInterval(predictFace, 800);
-                
+
             } catch (error) {
                 console.error(error);
                 document.getElementById('gate-message').innerText = "오류 발생! URL/카메라 확인";
@@ -1403,32 +1501,32 @@
                 clearInterval(predictionInterval);
                 predictionInterval = null;
             }
-            
+
             if (webcamStream) {
                 webcamStream.getTracks().forEach(track => track.stop());
                 webcamStream = null;
             }
-            
+
             const video = document.getElementById('webcam-video');
             const placeholder = document.getElementById('webcam-placeholder');
-            
+
             video.srcObject = null;
             video.style.display = 'none';
             placeholder.style.display = 'block';
-            
+
             document.getElementById('gate-message').innerText = "카메라 대기 중...";
             document.getElementById('gate-message').style.color = 'var(--screen-bg)';
             document.getElementById('predict-result').innerText = "";
-            
+
             // 버튼 상태 비활성화 초기화
             document.getElementById('gate-open-btn').disabled = true;
             document.getElementById('gate-close-btn').disabled = true;
-            
+
             const btn = document.getElementById('start-cam-btn');
             btn.innerText = "📹 카메라 켜기 & 인식 시작";
             btn.style.background = 'var(--yellow)';
             btn.onclick = startEntranceCamera;
-            
+
             isPredicting = false;
             logTerminal('System', 'Face recognition stopped.');
         }
@@ -1436,40 +1534,40 @@
         // 실시간 프레임 예측 실행
         async function predictFace() {
             if (!isPredicting || !tmModel) return;
-            
+
             const video = document.getElementById('webcam-video');
             try {
                 const prediction = await tmModel.predict(video);
-                
+
                 let highestClass = '';
                 let highestProb = 0;
-                
+
                 for (let i = 0; i < prediction.length; i++) {
                     if (prediction[i].probability > highestProb) {
                         highestProb = prediction[i].probability;
                         highestClass = prediction[i].className;
                     }
                 }
-                
+
                 const probPct = Math.round(highestProb * 100);
                 document.getElementById('predict-result').innerText = `${highestClass} (${probPct}%)`;
-                
+
                 // 90% 이상의 신뢰도를 가졌을 때 동작 수행
                 if (highestProb > 0.9) {
                     const classNameLower = highestClass.toLowerCase();
                     // !me, not me 등 부정 문자열이 포함된 경우는 me에서 제외
-                    const isMe = (classNameLower.includes('me') && !classNameLower.includes('!') && !classNameLower.includes('not')) || 
-                                 classNameLower.includes('집사') || 
-                                 classNameLower.includes('master') || 
-                                 classNameLower.includes('owner') || 
-                                 classNameLower.includes('user') || 
-                                 classNameLower.includes('jieun');
-                    
+                    const isMe = (classNameLower.includes('me') && !classNameLower.includes('!') && !classNameLower.includes('not')) ||
+                        classNameLower.includes('집사') ||
+                        classNameLower.includes('master') ||
+                        classNameLower.includes('owner') ||
+                        classNameLower.includes('user') ||
+                        classNameLower.includes('jieun');
+
                     if (isMe) {
                         // me가 90프로 이상이면 버튼 활성화
                         document.getElementById('gate-open-btn').disabled = false;
                         document.getElementById('gate-close-btn').disabled = false;
-                        
+
                         // 자동 열기 일시정지 상태가 아닐 때만 문 열기 명령 전송
                         if (!isAutoOpenPaused) {
                             document.getElementById('gate-message').innerText = "🟢 집사 확인! 제어 버튼 활성화";
@@ -1493,7 +1591,7 @@
                     document.getElementById('gate-message').innerText = "대상을 분석 중...";
                     document.getElementById('gate-message').style.color = 'var(--screen-bg)';
                 }
-                
+
             } catch (error) {
                 console.error("Prediction Error:", error);
             }
@@ -1516,7 +1614,7 @@
             document.getElementById('gate-message').innerText = "🔒 문 닫힘 (5초 자동 열기 정지)";
             document.getElementById('gate-message').style.color = '#ff5e5e';
             logTerminal('System', '문을 닫았습니다. 5초간 자동 열기가 정지됩니다.');
-            
+
             if (autoOpenTimeout) clearTimeout(autoOpenTimeout);
             autoOpenTimeout = setTimeout(() => {
                 isAutoOpenPaused = false;
@@ -1538,7 +1636,7 @@
         function toggleAlarm(num) {
             const timeInput = document.getElementById(`alarm-${num}-time`);
             const toggleBtn = document.getElementById(`alarm-${num}-toggle`);
-            
+
             if (!alarms[num].active) {
                 const selectedTime = timeInput.value;
                 if (!selectedTime) {
@@ -1548,7 +1646,7 @@
                 alarms[num].time = selectedTime;
                 alarms[num].active = true;
                 alarms[num].lastTriggered = '';
-                
+
                 toggleBtn.innerText = "ON";
                 toggleBtn.classList.remove('off');
                 toggleBtn.style.background = 'var(--mint)';
@@ -1567,7 +1665,7 @@
         // 1초 주기로 예약 알람 시각 체크하는 함수
         function checkAlarms() {
             if (!isConnected) return;
-            
+
             const now = new Date();
             const currentHour = String(now.getHours()).padStart(2, '0');
             const currentMin = String(now.getMinutes()).padStart(2, '0');
@@ -1580,7 +1678,7 @@
                         alarm.lastTriggered = currentTimeStr;
                         logTerminal('System', `⏰ 알람 시각 도달! ${num === '5' ? '학교종' : '작은별'} 멜로디를 재생합니다.`);
                         sendBLE(num); // BLE 알람 송신
-                        
+
                         const statusEl = document.getElementById('touch-status');
                         if (statusEl) {
                             statusEl.innerText = num === '5' ? "상태: 학교종 울림 ⏰" : "상태: 작은별 울림 ⏰";

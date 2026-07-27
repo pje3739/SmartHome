@@ -640,6 +640,39 @@
                         </div>
                         <button class="kitsch-btn" style="background: var(--mint); padding: 8px; font-size: 13px; margin: 0;" onclick="sendBLE('1')">온습도 측정 요청 🔄</button>
                     </div>
+
+                    <!-- 6. 액츄에이터 액션 그룹 (오른쪽에서 이동됨) -->
+                    <div class="control-item">
+                        <label>🔊 부저 & OLED 제어</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('5')">학교종 🎵</button>
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('6')">작은별 🌟</button>
+                        </div>
+                        <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin-top: 6px; background: var(--purple); color: #fff;" onclick="sendBLE('9')">OLED 캐릭터 출력 🖼️</button>
+                    </div>
+
+                    <!-- 8. 부저 알람 예약 시스템 (오른쪽에서 이동됨) -->
+                    <div class="control-item" style="text-align: left;">
+                        <label>⏰ 부저 멜로디 알람 예약</label>
+                        
+                        <!-- 학교종 알람 -->
+                        <div style="margin: 6px 0; border-bottom: 1px dashed #ccc; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px;">점심🎵</span>
+                            <div>
+                                <input type="time" id="alarm-5-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
+                                <button id="alarm-5-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(5)">OFF</button>
+                            </div>
+                        </div>
+
+                        <!-- 작은별 알람 -->
+                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px;">저녁🌟</span>
+                            <div>
+                                <input type="time" id="alarm-6-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
+                                <button id="alarm-6-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(6)">OFF</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -713,16 +746,6 @@
                         <button class="kitsch-btn" style="background: var(--purple); color: #fff; padding: 8px; font-size: 13px; margin: 0;" onclick="sendBLE('2')">조도 측정 요청 🔄</button>
                     </div>
 
-                    <!-- 6. 액츄에이터 액션 그룹 -->
-                    <div class="control-item">
-                        <label>🔊 부저 & OLED 제어</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('5')">학교종 🎵</button>
-                            <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('6')">작은별 🌟</button>
-                        </div>
-                        <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin-top: 6px; background: var(--purple); color: #fff;" onclick="sendBLE('9')">OLED 캐릭터 출력 🖼️</button>
-                    </div>
-
                     <!-- 7. 다마고치 배경 변경 -->
                     <div class="control-item">
                         <label>🖼️ 다마고치 LCD 배경 이미지</label>
@@ -730,29 +753,6 @@
                         <div style="display: flex; gap: 6px; margin-top: 6px;">
                             <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0;" onclick="document.getElementById('bg-upload-input').click()">이미지 업로드 📂</button>
                             <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0; background: #ff8b8b; color: #fff;" onclick="resetTamagotchiBg()">기본 배경 🔄</button>
-                        </div>
-                    </div>
-
-                    <!-- 8. 부저 알람 예약 시스템 -->
-                    <div class="control-item" style="text-align: left;">
-                        <label>⏰ 부저 멜로디 알람 예약</label>
-                        
-                        <!-- 학교종 알람 -->
-                        <div style="margin: 6px 0; border-bottom: 1px dashed #ccc; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px;">학교종 🎵</span>
-                            <div>
-                                <input type="time" id="alarm-5-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
-                                <button id="alarm-5-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(5)">OFF</button>
-                            </div>
-                        </div>
-
-                        <!-- 작은별 알람 -->
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px;">작은별 🌟</span>
-                            <div>
-                                <input type="time" id="alarm-6-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
-                                <button id="alarm-6-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(6)">OFF</button>
-                            </div>
                         </div>
                     </div>
                 </div>
