@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jieun의 스마트홈 대시보드</title>
+
+  <!-- Google Fonts: Bricolage Grotesque (Headlines), Be Vietnam Pro (Body), JetBrains Mono (Code/Metrics) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:wght@700;800&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* --- CSS Design System Variables (Y2K Cyber Kawaii Home Theme) --- */
+    :root {
+      /* Colors */
+      --bg-color: #1f0e13; /* Deep Plum */
+      --surface: #1f0e13;
+      --surface-dim: #1f0e13;
+      --surface-bright: #493338;
+      --surface-container-lowest: #19090e;
+      --surface-container-low: #28161b;
+      --surface-container: #2d1a1f;
+      --surface-container-high: #382529;
+      --surface-container-highest: #442f34;
+      
+      --on-surface: #fbdae1;
+      --on-surface-variant: #e5bcc5;
+      --inverse-surface: #fbdae1;
+      --inverse-on-surface: #3f2b30;
+      --outline: #ac878f;
+      --outline-variant: #5c3f46;
+      
+      --primary: #ffb1c4;
+      --primary-override: #ff007f; /* Neon Pink */
+      --on-primary: #65002e;
+      --primary-container: #ff4a8d;
+      --on-primary-container: #590028;
+      --inverse-primary: #ba005b;
+      
+      --secondary: #dcfdff;
+      --secondary-override: #00f3ff; /* Bright Cyan */
+      --on-secondary: #00373a;
+      --secondary-container: #00f1fd;
+      --on-secondary-container: #006a6f;
+      
+      --tertiary: #abd600;
+      --tertiary-override: #ccff00; /* Lime Green */
+      --on-tertiary: #283500;
+      --tertiary-container: #7c9c00;
+      --on-tertiary-container: #222e00;
+
+      --error: #ffb4ab;
+      --on-error: #690005;
+      --error-container: #93000a;
+      --on-error-container: #ffdad6;
+      
+      --background: #1f0e13;
+      --on-background: #fbdae1;
+      
+      /* Status colors mapped to design system colors */
+      --status-disconnected: #ffb4ab;
+      --status-connecting: #ccff00;
+      --status-connected: #00f3ff;
+
+      /* Font Families */
+      --font-headline: 'Bricolage Grotesque', sans-serif;
+      --font-body: 'Be Vietnam Pro', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #0b0507; /* Dark outer background */
+      color: var(--on-surface);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* --- Mobile Application Frame --- */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      background-color: var(--bg-color);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    }
+
+    @media (min-height: 700px) and (min-width: 480px) {
+      .app-container {
+        height: 850px;
+        border-radius: 40px;
+        border: 8px solid #2d1a1f;
+      }
+    }
+
+    /* --- Ambient Background Glows --- */
+    .bg-glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .pink-glow {
+      top: 15%;
+      left: -80px;
+      background-color: var(--primary-override);
+    }
+
+    .cyan-glow {
+      bottom: 25%;
+      right: -80px;
+      background-color: var(--secondary-override);
+    }
+
+    /* --- Scrollable Content --- */
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px 100px 20px;
+      scroll-behavior: smooth;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Custom Scrollbar for premium feel */
+    .app-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .app-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .app-content::-webkit-scrollbar-thumb {
+      background: var(--outline-variant);
+      border-radius: 10px;
+    }
+
+    /* --- Navigation Tabs --- */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --- Cyber Kawaii Cards --- */
+    .neu-card {
+      position: relative;
+      border-radius: 16px; /* rounded-lg base radius */
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 
+        0 10px 30px rgba(255, 0, 127, 0.12), 
+        inset 0 0 15px rgba(0, 243, 255, 0.15), 
+        inset 0 0 15px rgba(255, 0, 127, 0.15);
+      z-index: 2;
+    }
+
+    .neu-card::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 16px;
+      background: rgba(45, 26, 31, 0.75); /* Translucent surface container */
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: -2;
+    }
+
+    .neu-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 16px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, var(--secondary-override), var(--primary-override));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* --- Sparkle Accents --- */
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1.3) rotate(45deg); color: var(--secondary-override); }
+    }
+
+    .sparkle-icon {
+      position: absolute;
+      display: inline-block;
+      animation: shimmer 3s infinite ease-in-out;
+      color: var(--primary-override);
+      font-size: 1.1rem;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .sparkle-top-right {
+      top: 8px;
+      right: 8px;
+    }
+
+    .sparkle-bottom-left {
+      bottom: 8px;
+      left: 8px;
+    }
+
+    /* --- Jelly Buttons --- */
+    .neu-button {
+      background: linear-gradient(180deg, var(--primary-container) 0%, var(--primary-override) 100%);
+      color: #ffffff;
+      border: none;
+      border-bottom: 4px solid var(--on-primary-container);
+      border-radius: 9999px; /* full pill */
+      padding: 12px 20px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(255, 0, 127, 0.3);
+      transition: all 0.1s ease;
+      position: relative;
+      margin-bottom: 4px;
+    }
+
+    .neu-button::after {
+      /* Specular highlight for plastic feel */
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 10%;
+      width: 80%;
+      height: 35%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+      border-radius: 9999px;
+      pointer-events: none;
+    }
+
+    .neu-button:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .neu-button:active {
+      border-bottom-width: 0px;
+      margin-bottom: 8px;
+      transform: translateY(4px);
+      box-shadow: 0 2px 4px rgba(255, 0, 127, 0.2);
+    }
+
+    /* Jelly Button Color Variants */
+    .neu-button.btn-cyan {
+      background: linear-gradient(180deg, var(--secondary-container) 0%, var(--secondary-override) 100%);
+      color: var(--on-secondary);
+      border-bottom: 4px solid var(--on-secondary-container);
+      box-shadow: 0 4px 10px rgba(0, 243, 255, 0.3);
+    }
+    .neu-button.btn-cyan:active {
+      border-bottom-width: 0px;
+      box-shadow: 0 2px 4px rgba(0, 243, 255, 0.2);
+    }
+
+    .neu-button.btn-green {
+      background: linear-gradient(180deg, var(--tertiary-container) 0%, var(--tertiary-override) 100%);
+      color: var(--on-tertiary);
+      border-bottom: 4px solid var(--on-tertiary-container);
+      box-shadow: 0 4px 10px rgba(204, 255, 0, 0.3);
+    }
+    .neu-button.btn-green:active {
+      border-bottom-width: 0px;
+      box-shadow: 0 2px 4px rgba(204, 255, 0, 0.2);
+    }
+
+    /* --- Inset Panel --- */
+    .neu-inset-panel {
+      background: var(--surface-container-lowest);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.4), inset -2px -2px 5px rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--outline-variant);
+    }
+
+    /* --- Header Section --- */
+    .app-header {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-dim);
+      z-index: 10;
+      border-bottom: 1px solid var(--outline-variant);
+      position: relative;
+    }
+
+    .header-title-area h1 {
+      font-family: var(--font-headline);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 10px var(--primary-override), 0 0 20px rgba(255, 0, 127, 0.4);
+    }
+
+    .header-title-area p {
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* --- Sticker Chips (Retro Die-Cut) --- */
+    .sticker-chip {
+      background: #ffffff;
+      color: #1f0e13;
+      border: 2px solid #ffffff;
+      outline: 1px solid rgba(0, 0, 0, 0.8);
+      box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transform: rotate(-1.5deg);
+      transition: transform 0.2s ease;
+    }
+
+    .sticker-chip:hover {
+      transform: rotate(1deg) scale(1.05);
+    }
+
+    .status-badge {
+      /* Reused sticker look for header status badge */
+      background: #ffffff;
+      color: #1f0e13;
+      border: 2px solid #ffffff;
+      outline: 1px solid rgba(0, 0, 0, 0.8);
+      box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      transform: rotate(1.5deg);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+    }
+
+    .status-dot.connecting {
+      background-color: var(--status-connecting);
+      box-shadow: 0 0 8px var(--status-connecting);
+      animation: pulse 1s infinite alternate;
+    }
+
+    .status-dot.connected {
+      background-color: var(--status-connected);
+      box-shadow: 0 0 8px var(--status-connected);
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    /* --- Connection Overlay --- */
+    .overlay-blur {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(31, 14, 19, 0.85); /* Dark translucent background */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .overlay-blur.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.05);
+    }
+
+    .overlay-logo-outer {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(45, 26, 31, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(255, 0, 127, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.2);
+      margin-bottom: 30px;
+      border: 2px solid var(--primary-override);
+    }
+
+    .overlay-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-container), var(--primary-override));
+      box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.4), 0 5px 15px rgba(255, 0, 127, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 2.2rem;
+    }
+
+    .overlay-blur h2 {
+      font-family: var(--font-headline);
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px var(--primary-override);
+    }
+
+    .overlay-blur p {
+      font-size: 0.9rem;
+      color: var(--on-surface-variant);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    .connect-btn {
+      width: 100%;
+      max-width: 260px;
+      /* Styled as primary jelly button */
+    }
+
+    /* --- Sensor Monitoring Grid --- */
+    .dashboard-hero {
+      margin-bottom: 24px;
+    }
+
+    .welcome-card {
+      background: linear-gradient(135deg, rgba(255, 0, 127, 0.15), rgba(0, 243, 255, 0.15));
+      border-radius: 16px;
+      padding: 22px;
+      color: var(--on-surface);
+      border: 1px solid rgba(255, 177, 196, 0.2);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-card::after {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--secondary-override), var(--primary-override));
+      opacity: 0.1;
+      top: -50px;
+      right: -50px;
+    }
+
+    .welcome-card h2 {
+      font-family: var(--font-headline);
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+      text-shadow: 0 0 5px var(--primary-override);
+    }
+
+    .welcome-card p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .grid-2x2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .sensor-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+      padding: 16px;
+    }
+
+    .sensor-icon-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      z-index: 5;
+    }
+
+    .sensor-icon-wrapper {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--surface-container-lowest);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      font-size: 1.25rem;
+      border: 1px solid var(--outline-variant);
+    }
+
+    .sensor-refresh-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--outline-variant);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+      outline: none;
+      color: var(--on-surface-variant);
+    }
+
+    .sensor-refresh-btn:active {
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+    }
+
+    .sensor-info {
+      margin-top: auto;
+      z-index: 5;
+    }
+
+    .sensor-label {
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .sensor-value-container {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .sensor-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    }
+
+    .sensor-unit {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+    }
+
+    .sensor-status {
+      font-size: 0.7rem;
+      color: var(--on-surface-variant);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Special style for Full Width CDS Card */
+    .cds-card-full {
+      grid-column: span 2;
+      min-height: 120px;
+    }
+
+    .cds-layout {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 5;
+    }
+
+    /* Section titles */
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-shadow: 0 0 5px rgba(255,255,255,0.3);
+    }
+
+    /* --- Control Panel Grid --- */
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .control-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .control-card-title {
+      font-family: var(--font-headline);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 5;
+    }
+
+    .btn-group-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .btn-group-horizontal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    /* --- Retro Bezel Console Terminal --- */
+    .console-bezel {
+      background: #4a4d4a; /* Gameboy-like dark gray plastic */
+      border-radius: 20px;
+      padding: 16px;
+      border: 4px solid #2c2e2c;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 8px 16px rgba(0,0,0,0.5);
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .bezel-leds {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: #c5cbc5;
+      font-weight: 700;
+      align-items: center;
+    }
+
+    .led-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .led-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    @keyframes led-blink-red {
+      0%, 100% { opacity: 0.4; box-shadow: 0 0 2px #ff3b30; }
+      50% { opacity: 1; box-shadow: 0 0 8px #ff3b30; }
+    }
+    @keyframes led-blink-green {
+      0%, 100% { opacity: 0.8; box-shadow: 0 0 6px #ccff00; }
+      50% { opacity: 1; box-shadow: 0 0 12px #ccff00; }
+    }
+    .red-led {
+      background: #ff3b30;
+      animation: led-blink-red 1.5s infinite;
+    }
+    .green-led {
+      background: #ccff00;
+      animation: led-blink-green 1s infinite;
+    }
+
+    .console-container {
+      display: flex;
+      flex-direction: column;
+      height: 340px;
+      margin-bottom: 0px;
+      padding: 0px;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .console-body {
+      flex: 1;
+      background: #0f1c11 !important; /* Retro screen green */
+      border-radius: 12px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #39ff14 !important; /* Glowing Matrix Green */
+      overflow-y: auto;
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
+      border: 2px solid #050a05;
+    }
+
+    .console-line {
+      margin-bottom: 6px;
+      line-height: 1.4;
+      display: flex;
+      gap: 6px;
+    }
+
+    .console-timestamp {
+      color: #2b771b;
+      font-size: 0.75rem;
+    }
+
+    .console-tag {
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .console-tag.tx {
+      background: var(--secondary-override) !important;
+      color: #1f0e13 !important;
+    }
+
+    .console-tag.rx {
+      background: var(--primary-override) !important;
+      color: #1f0e13 !important;
+    }
+
+    .console-msg {
+      word-break: break-all;
+    }
+
+    .console-input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .console-input {
+      flex: 1;
+      background: #050a05;
+      border: 2px solid var(--secondary-override);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #39ff14;
+      outline: none;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+      caret-color: var(--primary-override); /* Pink blinking caret */
+    }
+
+    .console-input:focus {
+      border-color: var(--primary-override);
+    }
+
+    /* --- Glassmorphic Bottom Tab Navigation Bar --- */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: rgba(25, 9, 14, 0.85); /* Deep translucent plum */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 177, 196, 0.1);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 20px 10px 20px;
+      z-index: 50;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--on-surface-variant);
+      font-weight: 700;
+      font-size: 0.72rem;
+      transition: all 0.3s ease;
+      width: 70px;
+      position: relative;
+    }
+
+    .nav-icon {
+      font-size: 1.4rem;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 14px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-item.active {
+      color: var(--primary-override);
+    }
+
+    .nav-item.active .nav-icon {
+      background: var(--surface-bright);
+      box-shadow: 
+        0 4px 10px rgba(255, 0, 127, 0.2),
+        inset 0 0 5px rgba(255, 0, 127, 0.4);
+      transform: translateY(-4px);
+    }
+
+    .nav-item:active .nav-icon {
+      transform: scale(0.9) translateY(-2px);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Ambient Background Glows -->
+    <div class="bg-glow pink-glow"></div>
+    <div class="bg-glow cyan-glow"></div>
+
+    <!-- BLE Connection Overlay (Glassmorphism + Neumorphic Blur) -->
+    <div id="conn-overlay" class="overlay-blur">
+      <div class="overlay-logo-outer">
+        <div class="overlay-logo">🏠</div>
+      </div>
+      <h2>jieun의 스마트홈</h2>
+      <p>
+        ESP32 마이크로파이썬 스마트홈 대시보드입니다.<br>
+        Web Bluetooth 연결을 실행하여 집 안의 가전을 제어하세요.
+      </p>
+      <button id="connect-btn" class="connect-btn neu-button" onclick="connectDevice()">
+        ⚡ 스마트홈 기기 연결
+      </button>
+      <div style="font-size: 0.7rem; color: var(--on-surface-variant); margin-top: 14px; font-weight: 500;">
+        기기 탐색 프리픽스: <strong>ESP_</strong>
+      </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="app-header">
+      <div class="header-title-area">
+        <h1>jieun의 스마트홈</h1>
+        <p>기획/제작: <strong>jieun</strong></p>
+      </div>
+      <div class="status-badge">
+        <div id="status-dot" class="status-dot"></div>
+        <span id="status-text">연결 대기</span>
+      </div>
+    </header>
+
+    <!-- Scrollable Application Body Content -->
+    <main class="app-content">
+
+      <!-- ================= TAB 1: DASHBOARD ================= -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="dashboard-hero">
+          <div class="welcome-card">
+            <h2>안녕하세요! ✦</h2>
+            <p>
+              스마트홈 대시보드에 연결되었습니다. 센서들의 실시간 통계 데이터를 모니터링해보세요.
+            </p>
+          </div>
+        </div>
+
+        <div class="section-title">
+          📊 실시간 센서 정보
+        </div>
+
+        <div class="grid-2x2">
+
+          <!-- Temperature Card -->
+          <div class="neu-card sensor-card">
+            <span class="sparkle-icon sparkle-top-right">✦</span>
+            <div class="sensor-icon-row">
+              <div class="sensor-icon-wrapper" style="color: #ff4a8d;">🌡️</div>
+              <button class="sensor-refresh-btn" onclick="sendCommand('1')">🔄</button>
+            </div>
+            <div class="sensor-info">
+              <div class="sensor-label">실내 온도</div>
+              <div class="sensor-value-container">
+                <span id="temp-value" class="sensor-value">--</span>
+                <span class="sensor-unit">°C</span>
+              </div>
+              <div style="margin-top: 6px;">
+                <div class="sensor-status sticker-chip" id="temp-status">대기 중...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Humidity Card -->
+          <div class="neu-card sensor-card">
+            <span class="sparkle-icon sparkle-bottom-left">✦</span>
+            <div class="sensor-icon-row">
+              <div class="sensor-icon-wrapper" style="color: #00f1fd;">💧</div>
+              <button class="sensor-refresh-btn" onclick="sendCommand('1')">🔄</button>
+            </div>
+            <div class="sensor-info">
+              <div class="sensor-label">실내 습도</div>
+              <div class="sensor-value-container">
+                <span id="humi-value" class="sensor-value">--</span>
+                <span class="sensor-unit">%</span>
+              </div>
+              <div style="margin-top: 6px;">
+                <div class="sensor-status sticker-chip" id="humi-status">대기 중...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Illuminance Card (Full Width) -->
+          <div class="neu-card sensor-card cds-card-full">
+            <span class="sparkle-icon sparkle-top-right">✦</span>
+            <div class="sensor-icon-row">
+              <div class="sensor-icon-wrapper" style="color: #ccff00;">☀️</div>
+              <button class="sensor-refresh-btn" onclick="sendCommand('2')">🔄</button>
+            </div>
+            <div class="cds-layout">
+              <div class="sensor-info">
+                <div class="sensor-label">주변 밝기 (CdS)</div>
+                <div class="sensor-value-container">
+                  <span id="cds-value" class="sensor-value">--</span>
+                  <span class="sensor-unit">ADC</span>
+                </div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; justify-content: center; align-items: flex-end;">
+                <div class="sensor-label">조도 상태</div>
+                <div id="cds-status" class="sticker-chip" style="margin-top: 4px;">대기 중...</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="neu-button btn-cyan" onclick="refreshAllSensors()"
+          style="width: 100%; border-radius: 20px; font-size: 0.95rem;">
+          ⚡ 모든 센서 데이터 가져오기
+        </button>
+      </section>
+
+      <!-- ================= TAB 2: CONTROLS ================= -->
+      <section id="tab-controls" class="tab-panel">
+
+        <div class="section-title">
+          ⚙️ 스마트홈 가전 제어
+        </div>
+
+        <div class="control-grid">
+
+          <!-- RGB LED Lamp Control -->
+          <div class="neu-card control-card">
+            <span class="sparkle-icon sparkle-top-right">✦</span>
+            <div class="control-card-title">💡 RGB LED 전등</div>
+            <div class="btn-group-vertical">
+              <button class="neu-button" onclick="sendCommand('7')">💡 전등 켜기</button>
+              <button class="neu-button btn-cyan" onclick="sendCommand('8')">🔌 전등 끄기</button>
+            </div>
+          </div>
+
+          <!-- LCD Backlight Control -->
+          <div class="neu-card control-card">
+            <span class="sparkle-icon sparkle-bottom-left">✦</span>
+            <div class="control-card-title">📺 LCD 백라이트</div>
+            <div class="btn-group-vertical">
+              <button class="neu-button" onclick="sendCommand('3')">🔆 화면 켜기</button>
+              <button class="neu-button btn-cyan" onclick="sendCommand('4')">🌙 화면 끄기</button>
+            </div>
+          </div>
+
+          <!-- Piezo Buzzer Control (Full Width) -->
+          <div class="neu-card control-card" style="grid-column: span 2;">
+            <span class="sparkle-icon sparkle-top-right">✦</span>
+            <div class="control-card-title">🎵 패시브 부저 멜로디</div>
+            <div class="btn-group-horizontal">
+              <button class="neu-button" onclick="sendCommand('5')">🔔 학교종이 땡땡땡</button>
+              <button class="neu-button btn-cyan" onclick="sendCommand('6')">⭐ 반짝반짝 작은별</button>
+            </div>
+          </div>
+
+          <!-- OLED character control (Full Width) -->
+          <div class="neu-card control-card" style="grid-column: span 2;">
+            <span class="sparkle-icon sparkle-bottom-left">✦</span>
+            <div class="control-card-title">🖼️ OLED 비트맵 출력</div>
+            <button class="neu-button btn-green" onclick="sendCommand('9')" style="width: 100%;">
+              🐶 OLED 리락쿠마 비트맵 그리기
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: CONSOLE ================= -->
+      <section id="tab-console" class="tab-panel">
+        <div class="section-title">
+          📟 통신 로그 터미널
+        </div>
+
+        <div class="console-bezel">
+          <div class="bezel-leds">
+            <div class="led-item"><span class="led-dot red-led"></span> POWER</div>
+            <div class="led-item"><span class="led-dot green-led"></span> BATTERY</div>
+          </div>
+          <div class="console-container">
+            <div class="console-header">
+              <span style="font-size: 0.75rem; font-weight: 700; color: #c5cbc5;">LIVE BUS LOGS</span>
+              <button class="sensor-refresh-btn" onclick="clearConsole()" title="로그 초기화"
+                style="width: auto; height: auto; border-radius: 8px; padding: 4px 8px; font-size: 0.7rem; font-weight: 700;">
+                CLEAR
+              </button>
+            </div>
+
+            <div id="console-body" class="console-body">
+              <div class="console-line">
+                <span class="console-timestamp">[--:--:--]</span>
+                <span class="console-msg" style="color: #2b771b;">블루투스 연결 대기 중...</span>
+              </div>
+            </div>
+
+            <div class="console-input-row">
+              <input type="text" id="console-input" class="console-input" placeholder="명령어 입력 (예: 1, 7, 8)..."
+                onkeydown="if(event.key === 'Enter') sendConsoleInput()">
+              <button class="neu-button" onclick="sendConsoleInput()"
+                style="padding: 10px 16px; border-radius: 12px; font-size: 0.85rem;">전송</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Glassmorphic Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab(this, 'tab-dashboard')">
+        <div class="nav-icon">📊</div>
+        <span>센서현황</span>
+      </button>
+      <button class="nav-item" onclick="switchTab(this, 'tab-controls')">
+        <div class="nav-icon">⚙️</div>
+        <span>원격제어</span>
+      </button>
+      <button class="nav-item" onclick="switchTab(this, 'tab-console')">
+        <div class="nav-icon">📟</div>
+        <span>통신로그</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- --- Web Bluetooth JavaScript Implementation --- -->
+  <script>
+    // BLE NUS UUIDs
+    const NUS_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+    const NUS_RX_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // Web Write
+    const NUS_TX_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'; // Web Notify
+
+    let bleDevice = null;
+    let rxCharacteristic = null;
+    let txCharacteristic = null;
+    let isConnecting = false;
+    let bleBuffer = '';
+
+    // Switch between Dashboard, Controls, and Console tabs
+    function switchTab(clickedBtn, tabId) {
+      // Deactivate all navigation items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      // Activate clicked item
+      clickedBtn.classList.add('active');
+
+      // Hide all tab panels
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      // Show clicked panel
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Connect to the BLE Device
+    async function connectDevice() {
+      if (isConnecting) return;
+      isConnecting = true;
+      updateUIConnectionState('connecting');
+      addTerminalLog("블루투스 장치를 검색하는 중...", 'system');
+
+      try {
+        // Request bluetooth device with ESP_ name prefix and NUS service UUID in optionalServices to satisfy security rules
+        bleDevice = await navigator.bluetooth.requestDevice({
+          filters: [
+            { namePrefix: 'ESP_' }
+          ],
+          optionalServices: [NUS_SERVICE_UUID]
+        });
+
+        addTerminalLog(`기기 선택됨: ${bleDevice.name}. GATT 서버 연결 시도...`, 'system');
+
+        bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+        // Connect to GATT Server
+        const server = await bleDevice.gatt.connect();
+
+        addTerminalLog("GATT 서비스 획득 시도...", 'system');
+        const service = await server.getPrimaryService(NUS_SERVICE_UUID);
+
+        addTerminalLog("송수신 캐릭터리스틱 획득 시도...", 'system');
+        rxCharacteristic = await service.getCharacteristic(NUS_RX_UUID);
+        txCharacteristic = await service.getCharacteristic(NUS_TX_UUID);
+
+        // Start listening to notification from ESP32 (TX)
+        await txCharacteristic.startNotifications();
+        txCharacteristic.addEventListener('characteristicvaluechanged', handleNotifications);
+
+        addTerminalLog("연결 성공! 양방향 통신 준비 완료.", 'system');
+        updateUIConnectionState('connected');
+
+        // Auto pull initial sensor values
+        setTimeout(() => {
+          refreshAllSensors();
+        }, 800);
+
+      } catch (error) {
+        console.error(error);
+        addTerminalLog(`연결 실패: ${error.message}`, 'system');
+        updateUIConnectionState('disconnected');
+      } finally {
+        isConnecting = false;
+      }
+    }
+
+    // Disconnect event callback
+    function onDisconnected(event) {
+      addTerminalLog("블루투스 연결이 끊어졌습니다.", 'system');
+      updateUIConnectionState('disconnected');
+      clearSensorUI();
+    }
+
+    // Manual disconnection or cleanup
+    function disconnectDevice() {
+      if (bleDevice && bleDevice.gatt.connected) {
+        bleDevice.gatt.disconnect();
+      }
+    }
+
+    // Handle Incoming Notifications from ESP32
+    function handleNotifications(event) {
+      const value = event.target.value;
+      const decoder = new TextDecoder('utf-8');
+      const text = decoder.decode(value);
+
+      // Buffer streaming packets
+      bleBuffer += text;
+
+      const lines = bleBuffer.split('\n');
+      // Save the last incomplete chunk back into buffer
+      bleBuffer = lines.pop();
+
+      for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+
+        addTerminalLog(line, 'rx');
+        parseIncomingLine(line);
+      }
+    }
+
+    // Parse specific sensor messages from serial/ble stream
+    function parseIncomingLine(line) {
+      // 1. Temperature parsing
+      if (line.includes('temp')) {
+        const parts = line.split(':');
+        if (parts.length >= 2) {
+          const val = parts[1].trim();
+          document.getElementById('temp-value').innerText = val;
+          document.getElementById('temp-status').innerText = '업데이트됨';
+        }
+      }
+      // 2. Humidity parsing
+      else if (line.includes('humi')) {
+        const parts = line.split(':');
+        if (parts.length >= 2) {
+          const val = parts[1].trim();
+          document.getElementById('humi-value').innerText = val;
+          document.getElementById('humi-status').innerText = '업데이트됨';
+        }
+      }
+      // 3. CDS Illuminance parsing (checks if entirely numeric string)
+      else if (/^\d+$/.test(line)) {
+        const val = parseInt(line, 10);
+        document.getElementById('cds-value').innerText = val;
+
+        let statusStr = '';
+        if (val > 4000) {
+          statusStr = '어두움 (Dark) 🌙';
+        } else {
+          statusStr = '밝음 (Bright) ☀️';
+        }
+        document.getElementById('cds-status').innerText = statusStr;
+      }
+    }
+
+    async function sendCommand(charCommand) {
+      if (!rxCharacteristic) {
+        addTerminalLog(`전송 실패 (기기 미연결): '${charCommand}'`, 'system');
+        return;
+      }
+
+      try {
+        const encoder = new TextEncoder('utf-8');
+        const data = encoder.encode(charCommand);
+
+        // Use writeValueWithoutResponse if available (ideal for NUS UART RX), fallback to writeValue
+        if (typeof rxCharacteristic.writeValueWithoutResponse === 'function') {
+          await rxCharacteristic.writeValueWithoutResponse(data);
+        } else {
+          await rxCharacteristic.writeValue(data);
+        }
+
+        addTerminalLog(charCommand, 'tx');
+      } catch (error) {
+        console.error(error);
+        addTerminalLog(`명령어 전송 오류: ${error.message}`, 'system');
+      }
+    }
+
+    // Refresh all sensor information
+    function refreshAllSensors() {
+      if (!rxCharacteristic) {
+        addTerminalLog("센서 조회 실패: 기기 연결을 먼저 진행하십시오.", 'system');
+        return;
+      }
+      addTerminalLog("모든 센서 데이터 조회 요청 중...", 'system');
+
+      // Query Temp/Humi (1) and CDS (2) with a slight delay so packets don't collide
+      sendCommand('1');
+      setTimeout(() => {
+        sendCommand('2');
+      }, 300);
+    }
+
+    // Log Console Helper
+    function addTerminalLog(message, direction = 'system') {
+      const consoleBody = document.getElementById('console-body');
+      const time = new Date();
+      const timeStr = `[${time.toTimeString().split(' ')[0]}]`;
+
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'console-line';
+
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'console-timestamp';
+      timeSpan.innerText = timeStr;
+
+      lineDiv.appendChild(timeSpan);
+
+      if (direction === 'tx' || direction === 'rx') {
+        const tagSpan = document.createElement('span');
+        tagSpan.className = `console-tag ${direction}`;
+        tagSpan.innerText = direction.toUpperCase();
+        lineDiv.appendChild(tagSpan);
+      }
+
+      const msgSpan = document.createElement('span');
+      msgSpan.className = 'console-msg';
+
+      if (direction === 'system') {
+        msgSpan.style.color = '#888375';
+      } else if (direction === 'tx') {
+        msgSpan.style.color = '#f59e0b';
+      } else if (direction === 'rx') {
+        msgSpan.style.color = '#10b981';
+      }
+
+      msgSpan.innerText = message;
+      lineDiv.appendChild(msgSpan);
+
+      consoleBody.appendChild(lineDiv);
+      consoleBody.scrollTop = consoleBody.scrollHeight;
+    }
+
+    // Clear console panel
+    function clearConsole() {
+      const consoleBody = document.getElementById('console-body');
+      consoleBody.innerHTML = '';
+      addTerminalLog("콘솔 로그가 초기화되었습니다.", 'system');
+    }
+
+    // Handle user inputs directly on the console text field
+    function sendConsoleInput() {
+      const inputEl = document.getElementById('console-input');
+      const val = inputEl.value.trim();
+      if (!val) return;
+
+      sendCommand(val);
+      inputEl.value = '';
+    }
+
+    // Update connection statuses on DOM
+    function updateUIConnectionState(state) {
+      const overlay = document.getElementById('conn-overlay');
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+
+      dot.className = 'status-dot';
+
+      if (state === 'connected') {
+        overlay.classList.add('hidden');
+        dot.classList.add('connected');
+        text.innerText = '연결됨';
+      } else if (state === 'connecting') {
+        overlay.classList.remove('hidden');
+        dot.classList.add('connecting');
+        text.innerText = '연결 중';
+
+        // Changing connect button label in overlay
+        document.getElementById('connect-btn').innerText = '⏳ 연결 시도 중...';
+      } else {
+        overlay.classList.remove('hidden');
+        text.innerText = '연결 대기';
+        document.getElementById('connect-btn').innerText = '⚡ 스마트홈 기기 연결';
+      }
+    }
+
+    // Clear UI state values on disconnect
+    function clearSensorUI() {
+      document.getElementById('temp-value').innerText = '--';
+      document.getElementById('humi-value').innerText = '--';
+      document.getElementById('cds-value').innerText = '--';
+      document.getElementById('temp-status').innerText = '대기 중...';
+      document.getElementById('humi-status').innerText = '대기 중...';
+      document.getElementById('cds-status').innerText = '대기 중...';
+    }
+  </script>
+</body>
+
+</html>
