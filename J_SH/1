@@ -647,7 +647,8 @@
             <div class="tamagotchi-device">
                 <div class="tamagotchi-decorations">★ JIEUN'S HOME ★</div>
                 
-                <div class="lcd-screen">
+                <!-- LCD 뷰파인더 스크린 -->
+                <div class="lcd-screen" id="tamagotchi-lcd-screen">
                     <div class="screen-header">
                         <span id="display-pet-name">나비</span>
                         <span id="ble-status-badge" class="status-badge disconnected">● 연결 대기</span>
@@ -719,6 +720,16 @@
                             <button class="toggle-btn" style="font-size: 11px; padding: 6px;" onclick="sendBLE('6')">작은별 🌟</button>
                         </div>
                         <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin-top: 6px; background: var(--purple); color: #fff;" onclick="sendBLE('9')">OLED 캐릭터 출력 🖼️</button>
+                    </div>
+
+                    <!-- 7. 다마고치 배경 변경 -->
+                    <div class="control-item">
+                        <label>🖼️ 다마고치 LCD 배경 이미지</label>
+                        <input type="file" id="bg-upload-input" accept="image/*" style="display: none;" onchange="changeTamagotchiBg(this)">
+                        <div style="display: flex; gap: 6px; margin-top: 6px;">
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0;" onclick="document.getElementById('bg-upload-input').click()">이미지 업로드 📂</button>
+                            <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0; background: #ff8b8b; color: #fff;" onclick="resetTamagotchiBg()">기본 배경 🔄</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1192,6 +1203,9 @@
             statusEl.innerText = "상태: 행복함! ♥";
             petEl.style.transform = "scale(1.3)";
 
+            // 하트 플로팅 리액션 실행
+            spawnHearts();
+
             // ESP32 하드웨어 OLED에 이미지 출력 명령어 ('9') 송신
             sendBLE('9');
 
@@ -1199,6 +1213,73 @@
                 statusEl.innerText = "상태: 평화로움";
                 petEl.style.transform = "scale(1)";
             }, 1500);
+        }
+
+        // 캐릭터 행복 리액션 - 플로팅 하트 생성 함수
+        function spawnHearts() {
+            const stage = document.querySelector('.pet-stage');
+            if (!stage) return;
+            
+            const heartIcons = ['❤️', '💖', '💝', '💕', '💗'];
+            for (let i = 0; i < 6; i++) {
+                const heart = document.createElement('div');
+                heart.innerText = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+                heart.style.position = 'absolute';
+                heart.style.fontSize = `${Math.floor(Math.random() * 12) + 16}px`; // 16~28px
+                
+                // 캐릭터 중심(-25px ~ +25px) 주변에 랜덤 분사
+                const randomX = Math.floor(Math.random() * 50) - 25;
+                const delay = Math.random() * 300; 
+                
+                heart.style.left = `calc(50% + ${randomX}px - 10px)`;
+                heart.style.bottom = '20px';
+                heart.style.opacity = '1';
+                heart.style.pointerEvents = 'none';
+                heart.style.transition = 'all 1.2s ease-out';
+                
+                stage.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.style.transform = `translateY(-70px) scale(1.3)`;
+                    heart.style.opacity = '0';
+                }, delay);
+                
+                // 애니메이션 완료 후 제거
+                setTimeout(() => {
+                    heart.remove();
+                }, delay + 1200);
+            }
+        }
+
+        // 사용자 업로드 이미지로 LCD 배경 설정 함수
+        function changeTamagotchiBg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const lcd = document.getElementById('tamagotchi-lcd-screen');
+                    if (lcd) {
+                        lcd.style.backgroundImage = `url(${e.target.result})`;
+                        lcd.style.backgroundSize = 'cover';
+                        lcd.style.backgroundPosition = 'center';
+                        lcd.style.backgroundColor = 'transparent';
+                        // 글자가 잘 읽히도록 그림자 추가
+                        lcd.style.textShadow = '1px 1px 3px rgba(255, 255, 255, 0.9)';
+                        logTerminal('System', 'Tamagotchi LCD background image updated!');
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // LCD 배경 기본값으로 복구 함수
+        function resetTamagotchiBg() {
+            const lcd = document.getElementById('tamagotchi-lcd-screen');
+            if (lcd) {
+                lcd.style.backgroundImage = 'none';
+                lcd.style.backgroundColor = 'var(--screen-bg)';
+                lcd.style.textShadow = 'none';
+                logTerminal('System', 'Tamagotchi background reset to default.');
+            }
         }
 
         // 터미널 디버깅 메시지 기록 함수
