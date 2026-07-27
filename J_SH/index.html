@@ -1303,12 +1303,12 @@
                 const probPct = Math.round(highestProb * 100);
                 document.getElementById('predict-result').innerText = `${highestClass} (${probPct}%)`;
                 
-                // 80% 이상의 신뢰도를 가졌을 때 동작 수행
-                if (highestProb > 0.8) {
+                // 90% 이상의 신뢰도를 가졌을 때 동작 수행
+                if (highestProb > 0.9) {
                     const classNameLower = highestClass.toLowerCase();
                     
-                    // 등록된 얼굴 매칭 (집사, master, owner, user, jieun 등 포함)
-                    if (classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun')) {
+                    // 등록된 얼굴 매칭 (me, 집사, master, owner, user, jieun 등 포함)
+                    if (classNameLower.includes('me') || classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun')) {
                         document.getElementById('gate-message').innerText = "🟢 출입 허가! 문이 열립니다.";
                         document.getElementById('gate-message').style.color = '#9bbc0f';
                         sendBLE('o'); // 문 열기 명령 'o' 전송
