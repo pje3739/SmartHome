@@ -164,6 +164,18 @@ def on_rx(v):
         R.off()
         G.off()
         B.off()    
+
+    # 'r' 수신 시: RGB LED 빨간색 켜기
+    if v == 'r':
+        R.on()
+        G.off()
+        B.off()
+
+    # 'b' 수신 시: RGB LED 파란색 켜기
+    if v == 'b':
+        R.off()
+        G.off()
+        B.on()
     
     # '9' 수신 시: OLED에 Rilakkuma PBM 단색 비트맵 이미지 드로잉
     if v == '9':
