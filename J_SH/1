@@ -732,6 +732,29 @@
                             <button class="toggle-btn" style="font-size: 11px; padding: 6px; margin: 0; background: #ff8b8b; color: #fff;" onclick="resetTamagotchiBg()">기본 배경 🔄</button>
                         </div>
                     </div>
+
+                    <!-- 8. 부저 알람 예약 시스템 -->
+                    <div class="control-item" style="text-align: left;">
+                        <label>⏰ 부저 멜로디 알람 예약</label>
+                        
+                        <!-- 학교종 알람 -->
+                        <div style="margin: 6px 0; border-bottom: 1px dashed #ccc; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px;">학교종 🎵</span>
+                            <div>
+                                <input type="time" id="alarm-5-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
+                                <button id="alarm-5-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(5)">OFF</button>
+                            </div>
+                        </div>
+
+                        <!-- 작은별 알람 -->
+                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px;">작은별 🌟</span>
+                            <div>
+                                <input type="time" id="alarm-6-time" class="pixel-input" style="width: 85px; margin: 0; padding: 3px; font-size: 11px; height: 26px; box-shadow: none; border-radius: 4px; display: inline-block;">
+                                <button id="alarm-6-toggle" class="toggle-btn off" style="font-size: 10px; padding: 3px 6px; margin: 0 0 0 4px; width: 60px; display: inline-block; height: 26px; background: #ccc; color: #888;" onclick="toggleAlarm(6)">OFF</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1502,6 +1525,76 @@
                 logTerminal('System', '자동 열기 대기 상태가 복구되었습니다.');
             }, 5000);
         }
+
+        // ==========================================
+        // 부저 멜로디 알람 예약 시스템 스크립트
+        // ==========================================
+        let alarms = {
+            '5': { time: '', active: false, lastTriggered: '' },
+            '6': { time: '', active: false, lastTriggered: '' }
+        };
+
+        // 알람 상태 토글 함수
+        function toggleAlarm(num) {
+            const timeInput = document.getElementById(`alarm-${num}-time`);
+            const toggleBtn = document.getElementById(`alarm-${num}-toggle`);
+            
+            if (!alarms[num].active) {
+                const selectedTime = timeInput.value;
+                if (!selectedTime) {
+                    alert("알람 시간을 먼저 지정해 주세요!");
+                    return;
+                }
+                alarms[num].time = selectedTime;
+                alarms[num].active = true;
+                alarms[num].lastTriggered = '';
+                
+                toggleBtn.innerText = "ON";
+                toggleBtn.classList.remove('off');
+                toggleBtn.style.background = 'var(--mint)';
+                toggleBtn.style.color = '#000';
+                logTerminal('System', `${num === 5 ? '학교종 🎵' : '작은별 🌟'} 알람이 [${selectedTime}]으로 예약되었습니다.`);
+            } else {
+                alarms[num].active = false;
+                toggleBtn.innerText = "OFF";
+                toggleBtn.classList.add('off');
+                toggleBtn.style.background = '#ccc';
+                toggleBtn.style.color = '#888';
+                logTerminal('System', `${num === 5 ? '학교종 🎵' : '작은별 🌟'} 알람 예약이 취소되었습니다.`);
+            }
+        }
+
+        // 1초 주기로 예약 알람 시각 체크하는 함수
+        function checkAlarms() {
+            if (!isConnected) return;
+            
+            const now = new Date();
+            const currentHour = String(now.getHours()).padStart(2, '0');
+            const currentMin = String(now.getMinutes()).padStart(2, '0');
+            const currentTimeStr = `${currentHour}:${currentMin}`; // "HH:MM"
+
+            ['5', '6'].forEach(num => {
+                const alarm = alarms[num];
+                if (alarm.active && alarm.time === currentTimeStr) {
+                    if (alarm.lastTriggered !== currentTimeStr) {
+                        alarm.lastTriggered = currentTimeStr;
+                        logTerminal('System', `⏰ 알람 시각 도달! ${num === '5' ? '학교종' : '작은별'} 멜로디를 재생합니다.`);
+                        sendBLE(num); // BLE 알람 송신
+                        
+                        const statusEl = document.getElementById('touch-status');
+                        if (statusEl) {
+                            statusEl.innerText = num === '5' ? "상태: 학교종 울림 ⏰" : "상태: 작은별 울림 ⏰";
+                            setTimeout(() => {
+                                statusEl.innerText = "상태: 평화로움";
+                            }, 5000);
+                        }
+                    }
+                }
+            });
+        }
+
+        // 1초 간격 알람 체크 루프 시작
+        setInterval(checkAlarms, 1000);
     </script>
 </body>
 
