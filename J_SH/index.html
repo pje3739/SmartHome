@@ -1335,7 +1335,13 @@
                 // 90% 이상의 신뢰도를 가졌을 때 동작 수행
                 if (highestProb > 0.9) {
                     const classNameLower = highestClass.toLowerCase();
-                    const isMe = classNameLower.includes('me') || classNameLower.includes('집사') || classNameLower.includes('master') || classNameLower.includes('owner') || classNameLower.includes('user') || classNameLower.includes('jieun');
+                    // !me, not me 등 부정 문자열이 포함된 경우는 me에서 제외
+                    const isMe = (classNameLower.includes('me') && !classNameLower.includes('!') && !classNameLower.includes('not')) || 
+                                 classNameLower.includes('집사') || 
+                                 classNameLower.includes('master') || 
+                                 classNameLower.includes('owner') || 
+                                 classNameLower.includes('user') || 
+                                 classNameLower.includes('jieun');
                     
                     if (isMe) {
                         // me가 90프로 이상이면 버튼 활성화
